@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor de Evolução — Demo MVP</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=IBM+Plex+Mono:wght@400;500&family=Lato:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset ─────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+/* ─── Tokens ─────────────────────────────────────── */
+:root {
+  --ink:     #0A0806;
+  --s1:      #130D06;
+  --s2:      #1A1208;
+  --s3:      #24180A;
+  --s4:      #2E1E0C;
+  --pap:     #EDE0C4;
+  --pap2:    #C4B494;
+  --mut:     #7A6448;
+  --gold:    #C49A3C;
+  --gold-l:  #DCBC62;
+  --gold-xl: #F0D48C;
+  --bord:    rgba(255,255,255,0.055);
+  --bord-g:  rgba(196,154,60,0.22);
+  --gdim:    rgba(196,154,60,0.12);
+}
+
+/* ─── Base ───────────────────────────────────────── */
+html, body {
+  width:100%; height:100%; overflow:hidden;
+  background:var(--ink);
+  font-family:'Lato', sans-serif;
+  font-weight:300;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* ─── Grain overlay ──────────────────────────────── */
+body::before {
+  content:'';
+  position:fixed; inset:-50%;
+  width:200%; height:200%;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.032;
+  pointer-events:none;
+  z-index:9999;
+  animation:grain .6s steps(1) infinite;
+}
+@keyframes grain {
+  0%   {transform:translate(0,0)}
+  20%  {transform:translate(-2%,-2%)}
+  40%  {transform:translate(2%,1%)}
+  60%  {transform:translate(-1%,3%)}
+  80%  {transform:translate(3%,-1%)}
+  100% {transform:translate(0,0)}
+}
+
+/* ─── Deck ───────────────────────────────────────── */
+.deck { position:relative; width:100%; height:100vh; }
+
+/* ─── Slides ─────────────────────────────────────── */
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  padding:52px 80px 80px;
+  opacity:0;
+  transform:translateY(14px) scale(.995);
+  pointer-events:none;
+  transition:opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.16,1,.3,1);
+  overflow:hidden;
+  background:radial-gradient(ellipse 90% 70% at 25% 15%, #1B1107 0%, var(--ink) 100%);
+}
+.slide.active  { opacity:1; transform:translateY(0) scale(1); pointer-events:all; }
+.slide.leaving { opacity:0; transform:translateY(-10px) scale(.98); transition:opacity .28s ease, transform .28s ease; }
+
+/* ─── Slide decorative numeral ───────────────────── */
+.slide::after {
+  content:attr(data-num);
+  position:absolute; right:-16px; bottom:-40px;
+  font-family:'Cormorant Garamond', serif;
+  font-size:340px; font-weight:700; font-style:italic;
+  line-height:1; letter-spacing:-.04em;
+  color:rgba(196,154,60,.036);
+  pointer-events:none; user-select:none;
+}
+
+/* ─── Reveal animations ──────────────────────────── */
+.r {
+  opacity:0;
+  transform:translateY(20px);
+}
+.slide.active .r {
+  animation:rUp .7s cubic-bezier(.16,1,.3,1) forwards;
+}
+.slide.active [data-d="1"] { animation-delay:.06s }
+.slide.active [data-d="2"] { animation-delay:.16s }
+.slide.active [data-d="3"] { animation-delay:.26s }
+.slide.active [data-d="4"] { animation-delay:.36s }
+.slide.active [data-d="5"] { animation-delay:.46s }
+.slide.active [data-d="6"] { animation-delay:.56s }
+.slide.active [data-d="7"] { animation-delay:.66s }
+.slide.active [data-d="8"] { animation-delay:.76s }
+@keyframes rUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ─── Nav ────────────────────────────────────────── */
+.nav {
+  position:fixed; bottom:32px; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:18px;
+  z-index:200;
+}
+.nav-btn {
+  width:40px; height:40px; border-radius:50%;
+  background:transparent;
+  border:1px solid rgba(196,154,60,.25);
+  color:var(--gold); font-size:16px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-family:'IBM Plex Mono', monospace;
+  transition:background .2s, border-color .2s;
+}
+.nav-btn:hover:not(:disabled) { background:var(--gdim); border-color:rgba(196,154,60,.5); }
+.nav-btn:disabled { opacity:.25; cursor:default; }
+.track {
+  display:flex; gap:6px; align-items:center;
+}
+.pip {
+  height:2px; width:18px; border-radius:2px;
+  background:rgba(255,255,255,.12);
+  cursor:pointer;
+  transition:background .3s, width .3s;
+}
+.pip.on { background:var(--gold); width:32px; }
+
+/* ─── Slide counter ──────────────────────────────── */
+.cnt {
+  position:fixed; top:28px; right:36px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px; color:var(--mut);
+  letter-spacing:.12em;
+  z-index:200;
+}
+
+/* ─── Progress bar ───────────────────────────────── */
+.pbar {
+  position:fixed; top:0; left:0;
+  height:1px; background:linear-gradient(90deg, var(--gold) 0%, var(--gold-l) 100%);
+  transition:width .45s cubic-bezier(.4,0,.2,1);
+  z-index:200;
+}
+
+/* ─── Kbd hint ───────────────────────────────────── */
+.kh {
+  position:fixed; bottom:36px; right:36px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px; color:var(--mut);
+  display:flex; gap:5px; align-items:center;
+  z-index:200;
+}
+.k {
+  border:1px solid var(--bord);
+  background:var(--s2);
+  border-radius:3px;
+  padding:1px 6px;
+  font-size:10px; color:var(--mut);
+}
+
+/* ─── Typography system ──────────────────────────── */
+.mono {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--gold);
+}
+.section-tag {
+  display:inline-flex; align-items:center; gap:8px;
+  margin-bottom:24px;
+}
+.section-tag .mono { color:var(--mut); }
+.section-tag .mono b { color:var(--gold); }
+.rule-h {
+  width:32px; height:1px;
+  background:linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+}
+.display {
+  font-family:'Cormorant Garamond', serif;
+  color:var(--pap);
+  letter-spacing:-.03em;
+  line-height:1.08;
+}
+.display.xl   { font-size:clamp(52px,7vw,84px); font-weight:600; }
+.display.lg   { font-size:clamp(36px,4.5vw,58px); font-weight:500; }
+.display.md   { font-size:clamp(26px,3vw,38px); font-weight:500; }
+.display.sm   { font-size:clamp(20px,2.2vw,28px); font-weight:400; }
+.display.it   { font-style:italic; }
+.display em   { color:var(--gold); font-style:italic; }
+body-p, .bp {
+  font-size:clamp(13px,1.4vw,16px);
+  color:var(--pap2); line-height:1.7; font-weight:300;
+}
+p.bp { font-size:clamp(13px,1.4vw,16px); color:var(--pap2); line-height:1.7; }
+.accent { color:var(--gold); }
+.cream  { color:var(--pap); }
+.divr {
+  width:100%; height:1px;
+  background:linear-gradient(90deg, rgba(196,154,60,.25) 0%, transparent 100%);
+  margin:24px 0;
+}
+
+/* ─── Shared card ────────────────────────────────── */
+.card {
+  background:var(--s2);
+  border:1px solid var(--bord);
+  border-radius:14px;
+  padding:20px 22px;
+}
+.card.gold-border { border-color:var(--bord-g); background:linear-gradient(145deg, var(--s2), var(--s1)); }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 1 · COVER
+   ───────────────────────────────────────────────────── */
+#s1 {
+  background:radial-gradient(ellipse 100% 80% at 20% 10%, #1E1409 0%, var(--ink) 100%);
+  align-items:flex-start;
+  padding-left:clamp(60px,10vw,140px);
+}
+#s1 .overline {
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:32px;
+}
+#s1 .cover-title {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(56px,9vw,112px);
+  font-weight:300; font-style:italic;
+  line-height:1;
+  letter-spacing:-.04em;
+  color:var(--pap);
+  margin-bottom:8px;
+}
+#s1 .cover-title span {
+  font-weight:700; font-style:normal;
+  background:linear-gradient(135deg, var(--gold) 0%, var(--gold-l) 50%, var(--gold-xl) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+#s1 .cover-sub {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(18px,2.2vw,26px); font-weight:300; font-style:italic;
+  color:var(--mut); letter-spacing:-.01em;
+  margin-bottom:40px; max-width:480px;
+}
+#s1 .tags-row { display:flex; flex-wrap:wrap; gap:8px; }
+.tag-chip {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px; font-weight:400;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--mut);
+  border:1px solid var(--bord);
+  border-radius:3px;
+  padding:5px 12px;
+}
+#s1 .vert-line {
+  position:absolute; left:clamp(50px,8vw,110px); top:0; bottom:0;
+  width:1px;
+  background:linear-gradient(180deg, transparent 0%, rgba(196,154,60,.18) 30%, rgba(196,154,60,.18) 70%, transparent 100%);
+}
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 2 · PROBLEMA
+   ───────────────────────────────────────────────────── */
+#s2 .lay { display:grid; grid-template-columns:1fr 1.4fr; gap:72px; align-items:center; width:100%; max-width:1100px; }
+#s2 .big-num {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(96px,15vw,160px);
+  font-weight:700; font-style:italic;
+  letter-spacing:-.05em; line-height:.9;
+  background:linear-gradient(135deg, var(--gold) 0%, var(--gold-xl) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+#s2 .big-label {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--mut); margin-top:12px;
+  line-height:1.6; max-width:200px;
+}
+.prob-card {
+  display:flex; gap:14px; align-items:flex-start;
+  padding:16px 18px;
+  background:var(--s2); border:1px solid var(--bord);
+  border-radius:12px; margin-bottom:10px;
+}
+.prob-card:last-child { margin-bottom:0; border-color:var(--bord-g); background:var(--s3); }
+.prob-card .ico { font-size:18px; flex-shrink:0; margin-top:1px; }
+.prob-card p { font-size:13px; color:var(--pap2); line-height:1.55; }
+.prob-card p strong { color:var(--pap); font-weight:400; }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 3 · PERSONA
+   ───────────────────────────────────────────────────── */
+#s3 .lay { display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start; width:100%; max-width:1100px; }
+.persona-card {
+  background:linear-gradient(160deg, var(--s3) 0%, var(--s1) 100%);
+  border:1px solid var(--bord-g);
+  border-radius:18px; padding:32px 28px;
+}
+.av {
+  width:52px; height:52px; border-radius:50%;
+  background:var(--s4); border:1.5px solid var(--bord-g);
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; margin-bottom:18px;
+}
+.persona-name { font-family:'Cormorant Garamond', serif; font-size:28px; font-weight:600; color:var(--pap); letter-spacing:-.02em; }
+.persona-role { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin-top:4px; margin-bottom:20px; }
+.tr { display:flex; gap:10px; align-items:flex-start; margin-bottom:11px; }
+.tr .td { width:5px; height:5px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:7px; }
+.tr p { font-size:13px; color:var(--pap2); line-height:1.55; }
+.big-quote {
+  margin-top:22px; padding:16px 18px;
+  border-left:2px solid var(--gold);
+  background:var(--s1);
+  border-radius:0 10px 10px 0;
+  font-family:'Cormorant Garamond', serif;
+  font-size:17px; font-style:italic; font-weight:300;
+  color:var(--pap); line-height:1.55;
+}
+.insight {
+  background:var(--s2); border:1px solid var(--bord);
+  border-radius:12px; padding:16px 18px; margin-bottom:10px;
+}
+.insight .il { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut); margin-bottom:6px; }
+.insight .iv { font-size:14px; color:var(--pap); line-height:1.5; }
+.insight .iv span { color:var(--gold); }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 4 · SOLUÇÃO
+   ───────────────────────────────────────────────────── */
+#s4 .lay { display:grid; grid-template-columns:1fr auto 1fr; gap:32px; align-items:start; width:100%; max-width:1100px; }
+.vs-col { display:flex; flex-direction:column; gap:0; }
+.vs-col .vh {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  margin-bottom:16px;
+}
+.vs-col.left .vh { color:var(--mut); }
+.vs-col.right .vh { color:var(--gold); }
+.vs-item {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px 0; border-bottom:1px solid var(--bord);
+  font-size:14px; color:var(--pap2); line-height:1.45;
+}
+.vs-item:last-child { border-bottom:none; }
+.vs-item .x { color:#6B4040; font-size:12px; margin-top:2px; }
+.vs-item .c { color:var(--gold); font-size:12px; margin-top:2px; }
+.vs-item strong { color:var(--pap); font-weight:400; }
+.vs-sep {
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  padding-top:34px;
+}
+.vs-arrow {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:18px; color:var(--gold);
+}
+.vs-rule { width:1px; height:40px; background:linear-gradient(180deg, transparent, rgba(196,154,60,.3), transparent); }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 5 · IA SÓCRATES
+   ───────────────────────────────────────────────────── */
+#s5 .lay { display:grid; grid-template-columns:1.1fr .9fr; gap:56px; align-items:start; width:100%; max-width:1100px; }
+.step {
+  display:flex; gap:20px; align-items:flex-start;
+  padding:20px 0; border-bottom:1px solid var(--bord);
+}
+.step:last-child { border-bottom:none; }
+.sn {
+  width:34px; height:34px; flex-shrink:0; border-radius:50%;
+  background:var(--gdim); border:1px solid var(--bord-g);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cormorant Garamond', serif;
+  font-size:16px; font-weight:600; color:var(--gold); margin-top:2px;
+}
+.st .stitle { font-size:15px; font-weight:400; color:var(--pap); margin-bottom:4px; }
+.st .sdesc  { font-size:13px; color:var(--mut); line-height:1.5; }
+.st .sex {
+  display:inline-block; margin-top:8px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px; font-style:italic; color:var(--pap2);
+  background:var(--s2); border:1px solid var(--bord);
+  padding:4px 10px; border-radius:6px; font-style:normal;
+}
+.socr-out {
+  background:linear-gradient(155deg, var(--s3), var(--s1));
+  border:1px solid var(--bord-g); border-radius:18px;
+  padding:28px; position:sticky; top:0;
+  box-shadow:0 0 48px rgba(196,154,60,.06);
+}
+.out-l { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+.out-book {
+  background:var(--s1); border-radius:10px; padding:14px 16px; margin-bottom:14px;
+}
+.out-book .bt { font-family:'Cormorant Garamond', serif; font-size:16px; font-style:italic; color:var(--pap); margin-bottom:3px; }
+.out-book .ba { font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--mut); letter-spacing:.06em; }
+.out-grp { font-size:12px; color:var(--mut); margin-bottom:12px; }
+.out-grp span { color:var(--gold); }
+.out-why { font-family:'Cormorant Garamond', serif; font-size:15px; font-style:italic; color:var(--pap2); line-height:1.65; }
+.out-foot { margin-top:18px; padding-top:14px; border-top:1px solid var(--bord); font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--mut); line-height:1.6; }
+.out-foot span { color:var(--gold-l); }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 6 · JORNADA
+   ───────────────────────────────────────────────────── */
+#s6 { padding:44px 60px 80px; align-items:flex-start; justify-content:flex-start; }
+#s6 .j-intro { display:grid; grid-template-columns:auto 1fr; gap:56px; align-items:flex-end; margin-bottom:36px; }
+.j-grid {
+  display:grid; grid-template-columns:repeat(7,1fr);
+  gap:8px; width:100%;
+}
+.jc {
+  background:var(--s2); border:1px solid var(--bord);
+  border-radius:10px; padding:14px 12px;
+  display:flex; flex-direction:column; gap:6px;
+  transition:border-color .2s, background .2s;
+  cursor:default;
+}
+.jc:hover { border-color:var(--bord-g); }
+.jc.hl { border-color:var(--bord-g); background:linear-gradient(145deg,var(--s3),var(--s1)); }
+.jn { font-family:'IBM Plex Mono', monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut); }
+.jt { font-size:12px; font-weight:400; color:var(--pap); line-height:1.3; }
+.je { font-size:11px; font-style:italic; color:var(--gold); line-height:1.3; }
+.jo { font-size:10px; color:var(--mut); line-height:1.4; }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 7 · DEMO
+   ───────────────────────────────────────────────────── */
+#s7 .lay { display:grid; grid-template-columns:1.1fr .9fr; gap:48px; align-items:start; width:100%; max-width:1100px; }
+.flow-a {
+  display:flex; gap:14px; align-items:flex-start;
+  padding:18px 20px;
+  background:var(--s2); border:1px solid var(--bord);
+  border-radius:14px; margin-bottom:10px;
+  text-decoration:none;
+  transition:border-color .25s, background .25s, transform .2s;
+  cursor:pointer;
+}
+.flow-a:last-child { margin-bottom:0; }
+.flow-a:hover { border-color:var(--bord-g); background:var(--s3); transform:translateX(3px); }
+.fi {
+  width:38px; height:38px; flex-shrink:0;
+  border-radius:10px; background:var(--gdim); border:1px solid var(--bord-g);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.fn { font-size:14px; font-weight:400; color:var(--pap); margin-bottom:3px; }
+.fd { font-size:12px; color:var(--mut); line-height:1.45; }
+.fb {
+  display:inline-block; margin-top:8px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--gold); background:var(--gdim);
+  border:1px solid var(--bord-g);
+  padding:3px 8px; border-radius:3px;
+}
+.ch-box {
+  background:linear-gradient(155deg, var(--s3), var(--s1));
+  border:1px solid var(--bord-g); border-radius:18px; padding:26px;
+}
+.ch-l { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin-bottom:18px; }
+.ch-item { display:flex; gap:12px; align-items:flex-start; margin-bottom:16px; }
+.ch-icon { font-size:22px; margin-top:2px; }
+.chn { font-size:15px; font-weight:400; color:var(--pap); margin-bottom:2px; }
+.chw { font-size:12px; color:var(--mut); line-height:1.45; }
+.mets { margin-top:20px; padding-top:18px; border-top:1px solid var(--bord); }
+.ml { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut); margin-bottom:12px; }
+.mr { display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
+.mrn { font-size:13px; color:var(--pap2); }
+.mrv { font-family:'Cormorant Garamond', serif; font-size:20px; font-weight:600; color:var(--gold); letter-spacing:-.02em; }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 8 · MODELO
+   ───────────────────────────────────────────────────── */
+#s8 .lay { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start; width:100%; max-width:1100px; }
+.tier {
+  border-radius:14px; padding:22px 24px;
+  margin-bottom:12px;
+}
+.tier.free { background:var(--s2); border:1px solid var(--bord); }
+.tier.paid { background:linear-gradient(145deg,var(--s3),var(--s1)); border:1px solid var(--bord-g); box-shadow:0 0 32px rgba(196,154,60,.07); }
+.th { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; }
+.tn { font-family:'Cormorant Garamond', serif; font-size:22px; font-weight:500; color:var(--pap); }
+.tp { font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--gold); }
+.tf { display:flex; gap:10px; align-items:flex-start; margin-bottom:8px; font-size:13px; color:var(--pap2); line-height:1.4; }
+.tf .ck { color:var(--gold); font-size:12px; }
+.rat { display:flex; flex-direction:column; gap:10px; }
+.ri {
+  background:var(--s2); border:1px solid var(--bord);
+  border-radius:12px; padding:16px 18px;
+}
+.rt { font-size:14px; font-weight:400; color:var(--pap); margin-bottom:5px; }
+.rb { font-size:12px; color:var(--mut); line-height:1.55; }
+.rb span { color:var(--pap2); }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 9 · CERTEZAS
+   ───────────────────────────────────────────────────── */
+#s9 .lay { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:1000px; }
+.cbox {
+  background:var(--s2); border:1px solid var(--bord);
+  border-radius:14px; padding:20px 22px;
+}
+.cbox.k { border-color:rgba(100,180,100,.2); }
+.cbox.s { border-color:rgba(196,154,60,.22); }
+.cbox.u { border-color:rgba(180,100,100,.15); }
+.cbox.n { border-color:var(--bord); opacity:.65; }
+.cl { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:10px; }
+.cbox.k .cl { color:#7ABF78; }
+.cbox.s .cl { color:var(--gold); }
+.cbox.u .cl { color:#BF8A7A; }
+.cbox.n .cl { color:var(--mut); }
+.ci { display:flex; gap:8px; align-items:flex-start; margin-bottom:7px; font-size:13px; color:var(--pap2); line-height:1.45; }
+.cbox.k .ci::before { content:''; display:block; width:4px; height:4px; border-radius:50%; background:#7ABF78; flex-shrink:0; margin-top:7px; }
+.cbox.s .ci::before { content:''; display:block; width:4px; height:4px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:7px; }
+.cbox.u .ci::before { content:''; display:block; width:4px; height:4px; border-radius:50%; background:#BF8A7A; flex-shrink:0; margin-top:7px; }
+.cbox.n .ci::before { content:''; display:block; width:4px; height:4px; border-radius:50%; background:var(--mut); flex-shrink:0; margin-top:7px; }
+
+/* ─────────────────────────────────────────────────────
+   SLIDE 10 · FECHAMENTO
+   ───────────────────────────────────────────────────── */
+#s10 { text-align:center; justify-content:center; }
+#s10 .closing-text {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(18px,2.2vw,26px); font-weight:300; font-style:italic;
+  color:var(--mut); max-width:560px; line-height:1.5;
+  margin-bottom:12px;
+}
+#s10 .big-close {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(40px,5.5vw,70px); font-weight:600;
+  color:var(--pap); letter-spacing:-.03em;
+  line-height:1.1; max-width:700px; margin-bottom:40px;
+}
+#s10 .big-close em { color:var(--gold); font-style:italic; }
+.next-g { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:40px; max-width:720px; text-align:left; }
+.nc { background:var(--s2); border:1px solid var(--bord); border-radius:12px; padding:18px 20px; }
+.nc.done { border-color:rgba(100,180,100,.2); background:rgba(100,180,100,.03); }
+.nc.todo { border-color:var(--bord-g); }
+.ncs { font-family:'IBM Plex Mono', monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+.nc.done .ncs { color:#7ABF78; }
+.nc.todo .ncs { color:var(--gold); }
+.nct { font-size:14px; font-weight:400; color:var(--pap); margin-bottom:3px; }
+.ncd { font-size:12px; color:var(--mut); line-height:1.45; }
+.cta-row { display:flex; gap:12px; justify-content:center; }
+.cta {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 26px; border-radius:10px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px; letter-spacing:.06em;
+  font-weight:500; cursor:pointer;
+  text-decoration:none;
+  transition:opacity .2s, transform .18s;
+  border:none;
+}
+.cta:hover { opacity:.82; transform:translateY(-1px); }
+.cta.prim { background:linear-gradient(135deg, var(--gold) 0%, var(--gold-l) 100%); color:var(--ink); box-shadow:0 4px 18px rgba(196,154,60,.28); }
+.cta.sec  { background:var(--s3); border:1px solid var(--bord-g); color:var(--pap); }
+</style>
+</head>
+<body>
+
+<div class="pbar" id="pbar"></div>
+<div class="cnt" id="cnt">01 / 10</div>
+
+<div class="deck">
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 1 · COVER
+══════════════════════════════════════════════════════ -->
+<div class="slide active" id="s1" data-num="I">
+  <div class="vert-line"></div>
+
+  <div class="r" data-d="1">
+    <div class="overline">
+      <div class="rule-h"></div>
+      <span class="mono">Demo MVP &nbsp;·&nbsp; <b>2026</b></span>
+    </div>
+  </div>
+
+  <div class="r" data-d="2">
+    <div class="cover-title">Mentor de</div>
+  </div>
+  <div class="r" data-d="3">
+    <div class="cover-title"><span>Evolução</span></div>
+  </div>
+
+  <div class="r" data-d="4">
+    <div class="cover-sub" style="margin-top:14px;">
+      Uma plataforma de leitura que trata cada livro como<br>uma intervenção no estado interno da pessoa.
+    </div>
+  </div>
+
+  <div class="r" data-d="5">
+    <div class="tags-row">
+      <span class="tag-chip">IA Sócrates</span>
+      <span class="tag-chip">Grupos Assíncronos</span>
+      <span class="tag-chip">Match por Estado Interno</span>
+      <span class="tag-chip">MVP via Telegram</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 2 · PROBLEMA
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s2" data-num="II">
+  <div class="lay">
+    <div>
+      <div class="r" data-d="1">
+        <div class="section-tag">
+          <span class="mono"><b>02</b> / Problema</span>
+        </div>
+      </div>
+      <div class="r" data-d="2">
+        <div class="big-num">73%</div>
+      </div>
+      <div class="r" data-d="3">
+        <div class="big-label">não terminam o livro que começaram</div>
+      </div>
+      <div class="r" data-d="4" style="margin-top:32px;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:clamp(18px,2vw,24px); font-style:italic; color:var(--mut); line-height:1.45; max-width:240px;">
+          "O conhecimento lido<br>escorre pelos dedos."
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="r" data-d="2">
+        <div class="display md" style="margin-bottom:8px;">O Limbo da<br>Leitura Passiva</div>
+        <p class="bp" style="margin-bottom:24px; max-width:420px;">Não é falta de tempo — é falta de <span class="accent">ancoragem emocional</span>. Nenhum produto atual resolve isso.</p>
+      </div>
+      <div class="r" data-d="3">
+        <div class="prob-card">
+          <span class="ico">📚</span>
+          <p><strong>Goodreads e Skoob</strong> tratam leitura como dado estático. Estrelas, estantes. Zero contexto emocional.</p>
+        </div>
+      </div>
+      <div class="r" data-d="4">
+        <div class="prob-card">
+          <span class="ico">📅</span>
+          <p><strong>Clubes do livro</strong> exigem horário fixo. A persona não tem esse tipo de disponibilidade.</p>
+        </div>
+      </div>
+      <div class="r" data-d="5">
+        <div class="prob-card">
+          <span class="ico">✦</span>
+          <p><strong>A oportunidade:</strong> recomendar pelo <span class="accent">estado interno agora</span> — não pelo histórico superficial de gênero.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 3 · PERSONA
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s3" data-num="III">
+  <div class="lay">
+    <div>
+      <div class="r" data-d="1">
+        <div class="section-tag">
+          <span class="mono"><b>03</b> / Persona</span>
+        </div>
+      </div>
+      <div class="r" data-d="2">
+        <div class="persona-card">
+          <div class="av">👩‍💼</div>
+          <div class="persona-name">Renata</div>
+          <div class="persona-role">Executiva · Mãe · ~38 anos</div>
+          <div class="tr"><div class="td"></div><p>Alta carga mental, agenda fragmentada, rotina intensa.</p></div>
+          <div class="tr"><div class="td"></div><p>Tentou manter hábito de leitura várias vezes. Sempre abandona.</p></div>
+          <div class="tr"><div class="td"></div><p>Frustrada com recomendações genéricas e clubes com horário fixo.</p></div>
+          <div class="tr"><div class="td"></div><p>Quer expansão intelectual — mas precisa ser respeitada na sua energia real.</p></div>
+          <div class="big-quote">
+            "Quero sentir que fui entendida antes de receber qualquer recomendação."
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="r" data-d="1">
+        <div class="display md" style="margin-bottom:24px;">O que faz<br>ela confiar</div>
+      </div>
+      <div class="r" data-d="3">
+        <div class="insight">
+          <div class="il">Gatilho de entrada</div>
+          <div class="iv">Copy que <span>nomeia a dor</span> antes de vender a solução.</div>
+        </div>
+      </div>
+      <div class="r" data-d="4">
+        <div class="insight">
+          <div class="il">Momento "uau"</div>
+          <div class="iv">Primeira recomendação da IA — <span>"como ela sabia?"</span></div>
+        </div>
+      </div>
+      <div class="r" data-d="5">
+        <div class="insight">
+          <div class="il">Risco crítico</div>
+          <div class="iv">Qualquer recomendação genérica <span>quebra a confiança</span> para sempre.</div>
+        </div>
+      </div>
+      <div class="r" data-d="6">
+        <div class="insight">
+          <div class="il">O que a mantém</div>
+          <div class="iv">Sentir que <span>não está sozinha</span> — presença sem pressão.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 4 · SOLUÇÃO
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s4" data-num="IV">
+  <div class="r" data-d="1" style="text-align:center; margin-bottom:28px;">
+    <div class="section-tag" style="justify-content:center;">
+      <span class="mono"><b>04</b> / Solução</span>
+    </div>
+    <div class="display lg it" style="margin-bottom:6px;">Leitura como <em>intervenção intencional</em></div>
+  </div>
+
+  <div class="lay" style="width:100%; max-width:1000px;">
+    <div class="r" data-d="2">
+      <div class="vs-col left">
+        <div class="vh">Plataformas atuais</div>
+        <div class="vs-item"><span class="x">✗</span> Recomendam por gênero e histórico</div>
+        <div class="vs-item"><span class="x">✗</span> Grupos com encontros fixos semanais</div>
+        <div class="vs-item"><span class="x">✗</span> Sem feedback emocional da jornada</div>
+        <div class="vs-item"><span class="x">✗</span> Gamificação vazia — pontos genéricos</div>
+        <div class="vs-item"><span class="x">✗</span> IA ausente entre as sessões de leitura</div>
+      </div>
+    </div>
+
+    <div class="r" data-d="3">
+      <div class="vs-sep">
+        <div class="vs-rule"></div>
+        <div class="vs-arrow">→</div>
+        <div class="vs-rule"></div>
+      </div>
+    </div>
+
+    <div class="r" data-d="4">
+      <div class="vs-col right">
+        <div class="vh">Mentor de Evolução</div>
+        <div class="vs-item"><span class="c">✦</span> <span>Match por <strong>estado interno</strong> em tempo real</span></div>
+        <div class="vs-item"><span class="c">✦</span> Grupos 100% assíncronos, sem horário</div>
+        <div class="vs-item"><span class="c">✦</span> Ritual de conclusão com espelho de reflexão</div>
+        <div class="vs-item"><span class="c">✦</span> Evolução de perfil — identidade literária</div>
+        <div class="vs-item"><span class="c">✦</span> IA como rede social: leve, presente, sem cobrar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 5 · IA SÓCRATES
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s5" data-num="V">
+  <div class="lay">
+    <div>
+      <div class="r" data-d="1">
+        <div class="section-tag">
+          <span class="mono"><b>05</b> / Onboarding</span>
+        </div>
+        <div class="display lg" style="margin-bottom:8px;">IA Sócrates —<br>4 perguntas projetivas</div>
+        <p class="bp" style="margin-bottom:24px; max-width:380px; font-size:13px;">A IA não pergunta <em style="color:var(--pap)">"que gênero você gosta?"</em> — ela pergunta <span class="accent">como você está.</span> O resultado parece feito à mão.</p>
+      </div>
+      <div class="r" data-d="2">
+        <div class="step">
+          <div class="sn">1</div>
+          <div class="st">
+            <div class="stitle">Histórico + Energia</div>
+            <div class="sdesc">Último livro lido e nota de energia atual (0–10).</div>
+            <div class="sex">"Como você se sente hoje, de 0 a 10?"</div>
+          </div>
+        </div>
+      </div>
+      <div class="r" data-d="3">
+        <div class="step">
+          <div class="sn">2</div>
+          <div class="st">
+            <div class="stitle">Afinidade de Estante</div>
+            <div class="sdesc">Vida Real · Futuro &amp; Estratégia · Profundidade</div>
+          </div>
+        </div>
+      </div>
+      <div class="r" data-d="4">
+        <div class="step">
+          <div class="sn">3</div>
+          <div class="st">
+            <div class="stitle">Estado de Espírito</div>
+            <div class="sdesc">Modo Bateria Fraca ou Modo Expansão</div>
+          </div>
+        </div>
+      </div>
+      <div class="r" data-d="5">
+        <div class="step">
+          <div class="sn">4</div>
+          <div class="st">
+            <div class="stitle">Velocidade de Cruzeiro</div>
+            <div class="sdesc">15 min/dia (Pílulas) ou 30 min+ (Mergulho Profundo)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="r" data-d="3">
+      <div class="socr-out">
+        <div class="out-l">Saída da IA Sócrates</div>
+        <div class="out-book">
+          <div class="bt">Mindset — A Nova Psicologia do Sucesso</div>
+          <div class="ba">Carol S. Dweck</div>
+        </div>
+        <div class="out-grp">Grupo: <span>Expansão &amp; Mentalidade #4</span></div>
+        <div class="out-why">
+          "Você está em Modo Expansão, mas com energia moderada. Este livro vai te desafiar nos momentos certos — sem exigir que você esteja 100% o tempo todo."
+        </div>
+        <div class="out-foot">
+          6 combinações mapeadas no MVP<br>
+          <span>Afinidade × Estado de Espírito</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 6 · JORNADA
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s6" data-num="VI">
+  <div class="r" data-d="1">
+    <div class="j-intro">
+      <div>
+        <div class="section-tag">
+          <span class="mono"><b>06</b> / Experiência</span>
+        </div>
+        <div class="display lg">Jornada<br>de 7 etapas</div>
+      </div>
+      <p class="bp" style="max-width:340px; font-size:13px;">Do primeiro post ao próximo ciclo. As etapas marcadas em dourado são os momentos de maior impacto emocional.</p>
+    </div>
+  </div>
+  <div class="r" data-d="2">
+    <div class="j-grid">
+      <div class="jc">
+        <div class="jn">01</div>
+        <div class="jt">Descoberta</div>
+        <div class="je">"Isso é o que eu sinto"</div>
+        <div class="jo">Copy nomeia a dor antes de vender.</div>
+      </div>
+      <div class="jc">
+        <div class="jn">02</div>
+        <div class="jt">Decisão de Entrar</div>
+        <div class="je">Cautelosamente animada</div>
+        <div class="jo">Freemium elimina barreira financeira.</div>
+      </div>
+      <div class="jc hl">
+        <div class="jn">03 ✦</div>
+        <div class="jt">Onboarding — IA Sócrates</div>
+        <div class="je">"Como ela sabia?"</div>
+        <div class="jo">Momento "uau" — recomendação empática.</div>
+      </div>
+      <div class="jc">
+        <div class="jn">04</div>
+        <div class="jt">Ativação (3 dias)</div>
+        <div class="je">Pertencimento nascendo</div>
+        <div class="jo">IA faz 1ª pergunta leve em 24h.</div>
+      </div>
+      <div class="jc">
+        <div class="jn">05</div>
+        <div class="jt">Leitura</div>
+        <div class="je">Fluxo / sem culpa</div>
+        <div class="jo">Presença sem pressão.</div>
+      </div>
+      <div class="jc hl">
+        <div class="jn">06 ✦</div>
+        <div class="jt">Conclusão</div>
+        <div class="je">Realização</div>
+        <div class="jo">Ritual: reflexão + resposta da IA.</div>
+      </div>
+      <div class="jc">
+        <div class="jn">07</div>
+        <div class="jt">Próximo Ciclo</div>
+        <div class="je">"Sou alguém que cresce"</div>
+        <div class="jo">IA mostra evolução do perfil.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 7 · DEMO MVP
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s7" data-num="VII">
+  <div class="lay">
+    <div>
+      <div class="r" data-d="1">
+        <div class="section-tag">
+          <span class="mono"><b>07</b> / Demo</span>
+        </div>
+        <div class="display lg" style="margin-bottom:8px;">3 fluxos<br>navegáveis</div>
+        <p class="bp" style="margin-bottom:24px; font-size:13px;">Protótipo HTML completo. Cada card abre o fluxo diretamente.</p>
+      </div>
+      <div class="r" data-d="2">
+        <a class="flow-a" href="mentor-evolucao-onboarding.html" target="_blank">
+          <div class="fi">🧠</div>
+          <div>
+            <div class="fn">Fluxo 1 — Onboarding IA Sócrates</div>
+            <div class="fd">Boas-vindas → 4 perguntas projetivas → entrega personalizada com grupo e justificativa</div>
+            <div class="fb">Abrir demo →</div>
+          </div>
+        </a>
+      </div>
+      <div class="r" data-d="3">
+        <a class="flow-a" href="mentor-evolucao-home.html" target="_blank">
+          <div class="fi">📖</div>
+          <div>
+            <div class="fn">Fluxo 2 — Home + Sala de Leitura</div>
+            <div class="fd">Dashboard com streak, nudge da IA, chat assíncrono — IA responde automaticamente</div>
+            <div class="fb">Abrir demo →</div>
+          </div>
+        </a>
+      </div>
+      <div class="r" data-d="4">
+        <a class="flow-a" href="mentor-evolucao-conclusao.html" target="_blank">
+          <div class="fi">✨</div>
+          <div>
+            <div class="fn">Fluxo 3 — Conclusão + Próximo Ciclo</div>
+            <div class="fd">Conquista animada → reflexão → resposta empática → novo livro com evolução de perfil</div>
+            <div class="fb">Abrir demo →</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="r" data-d="3">
+      <div class="ch-box">
+        <div class="ch-l">Canal de MVP</div>
+        <div class="ch-item">
+          <div class="ch-icon">✈️</div>
+          <div>
+            <div class="chn">Telegram</div>
+            <div class="chw">Melhor suporte a bots nativos, múltiplas salas por livro, acessível — sem novo app para instalar.</div>
+          </div>
+        </div>
+        <div class="mets">
+          <div class="ml">Métricas de sucesso — V1</div>
+          <div class="mr"><span class="mrn">Conclusão da 1ª leitura</span><span class="mrv">≥ 70%</span></div>
+          <div class="mr"><span class="mrn">Senso de pertencimento</span><span class="mrv">> 8/10</span></div>
+          <div class="mr"><span class="mrn">Retorno ao 2º ciclo</span><span class="mrv">a medir</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 8 · MODELO
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s8" data-num="VIII">
+  <div class="lay">
+    <div>
+      <div class="r" data-d="1">
+        <div class="section-tag">
+          <span class="mono"><b>08</b> / Modelo de Negócio</span>
+        </div>
+        <div class="display lg" style="margin-bottom:24px;">Freemium →<br>Assinatura</div>
+      </div>
+      <div class="r" data-d="2">
+        <div class="tier free">
+          <div class="th"><div class="tn">Gratuito</div><div class="tp">R$ 0</div></div>
+          <div class="tf"><span class="ck">✦</span> Onboarding completo com IA Sócrates</div>
+          <div class="tf"><span class="ck">✦</span> 1 recomendação de livro por ciclo</div>
+          <div class="tf"><span class="ck">✦</span> Acesso ao grupo de leitura</div>
+          <div class="tf" style="opacity:.35;"><span class="ck">—</span> Histórico de perfil e evolução</div>
+          <div class="tf" style="opacity:.35;"><span class="ck">—</span> Ritual de conclusão com IA</div>
+        </div>
+      </div>
+      <div class="r" data-d="3">
+        <div class="tier paid">
+          <div class="th"><div class="tn">Premium</div><div class="tp">Tiers a definir</div></div>
+          <div class="tf"><span class="ck">✦</span> Tudo do gratuito</div>
+          <div class="tf"><span class="ck">✦</span> Histórico completo de perfil</div>
+          <div class="tf"><span class="ck">✦</span> Ritual de conclusão + resposta da IA</div>
+          <div class="tf"><span class="ck">✦</span> Evolução de perfil entre ciclos</div>
+          <div class="tf"><span class="ck">✦</span> Gamificação de significado (V2)</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="r" data-d="1">
+        <div class="display md" style="margin-bottom:20px;">Racional das<br>decisões</div>
+      </div>
+      <div class="rat">
+        <div class="r" data-d="2">
+          <div class="ri">
+            <div class="rt">Por que começar grátis?</div>
+            <div class="rb">Persona cética com apps. <span>Freemium elimina o atrito financeiro</span> — o valor se prova dentro do produto, não antes.</div>
+          </div>
+        </div>
+        <div class="r" data-d="3">
+          <div class="ri">
+            <div class="rt">Por que adiar a gamificação?</div>
+            <div class="rb">Pontos antes da confiança parecem superficiais. O V1 constrói <span>hábito e vínculo</span>. Gamificação de significado vem no V2.</div>
+          </div>
+        </div>
+        <div class="r" data-d="4">
+          <div class="ri">
+            <div class="rt">Maior driver de retenção</div>
+            <div class="rb">O <span>ritual de conclusão</span> — IA lê a reflexão e responde com significado. Maior momento de vínculo emocional.</div>
+          </div>
+        </div>
+        <div class="r" data-d="5">
+          <div class="ri">
+            <div class="rt">Aquisição</div>
+            <div class="rb"><span>Orgânico e indicação</span> primeiro. Canal a otimizar após coorte inicial validar retenção.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 9 · CERTEZAS
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s9" data-num="IX">
+  <div class="r" data-d="1" style="margin-bottom:28px; text-align:center;">
+    <div class="section-tag" style="justify-content:center;">
+      <span class="mono"><b>09</b> / Mapa de Incertezas</span>
+    </div>
+    <div class="display lg">O que sabemos e<br>o que vamos validar</div>
+  </div>
+  <div class="lay" style="grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:960px;">
+    <div class="r" data-d="2">
+      <div class="cbox k">
+        <div class="cl">Sabemos</div>
+        <div class="ci">Problema, persona e diferencial estratégico</div>
+        <div class="ci">Fluxo de onboarding — 4 etapas da IA Sócrates</div>
+        <div class="ci">Lógica de match: estado + afinidade + velocidade</div>
+        <div class="ci">Canal MVP: Telegram</div>
+        <div class="ci">Métricas: 70% conclusão, pertencimento >8</div>
+      </div>
+    </div>
+    <div class="r" data-d="3">
+      <div class="cbox s">
+        <div class="cl">Suspeitamos</div>
+        <div class="ci">Freemium reduz atrito sem comprometer valor percebido</div>
+        <div class="ci">Ritual de conclusão é o maior momento de retenção emocional</div>
+        <div class="ci">Gamificação de significado no V2 — na identidade, não em pontos</div>
+      </div>
+    </div>
+    <div class="r" data-d="4">
+      <div class="cbox u">
+        <div class="cl">Não sabemos ainda</div>
+        <div class="ci">Tiers exatos do modelo freemium</div>
+        <div class="ci">Frequência ideal de mensagens da IA (sem virar ruído)</div>
+        <div class="ci">Taxa real de engajamento nas salas assíncronas</div>
+      </div>
+    </div>
+    <div class="r" data-d="5">
+      <div class="cbox n">
+        <div class="cl">Não podemos saber ainda</div>
+        <div class="ci">Retenção de longo prazo — depende de coorte real</div>
+        <div class="ci">Canal de aquisição que converte melhor para essa persona</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 10 · FECHAMENTO
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s10" data-num="X">
+  <div class="r" data-d="1">
+    <div class="section-tag" style="justify-content:center;">
+      <span class="mono"><b>10</b> / Próximos Passos</span>
+    </div>
+  </div>
+  <div class="r" data-d="2">
+    <div class="closing-text">O protótipo está pronto. A próxima etapa é real.</div>
+    <div class="big-close">De protótipo para<br><em>coorte real.</em></div>
+  </div>
+  <div class="r" data-d="3">
+    <div class="next-g">
+      <div class="nc done">
+        <div class="ncs">✓ Concluído</div>
+        <div class="nct">Protótipo navegável</div>
+        <div class="ncd">3 fluxos: onboarding, leitura e conclusão.</div>
+      </div>
+      <div class="nc done">
+        <div class="ncs">✓ Concluído</div>
+        <div class="nct">Design system</div>
+        <div class="ncd">Visual identity completo nos 3 arquivos.</div>
+      </div>
+      <div class="nc todo">
+        <div class="ncs">→ Próximo</div>
+        <div class="nct">Definir tiers de assinatura</div>
+        <div class="ncd">Mapear freemium vs. premium e testar willingness-to-pay.</div>
+      </div>
+      <div class="nc todo">
+        <div class="ncs">→ Próximo</div>
+        <div class="nct">Recrutar 1ª coorte (Concierge MVP)</div>
+        <div class="ncd">5–10 usuárias do perfil Renata para validar as métricas.</div>
+      </div>
+    </div>
+  </div>
+  <div class="r" data-d="4">
+    <div class="cta-row">
+      <a class="cta prim" href="mentor-evolucao-onboarding.html" target="_blank">▶ Iniciar Demo</a>
+      <a class="cta sec"  href="mentor-evolucao-home.html"      target="_blank">Ver Home + Sala</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- Navigation -->
+<div class="nav">
+  <button class="nav-btn" id="prev" onclick="go(-1)">←</button>
+  <div class="track" id="track"></div>
+  <button class="nav-btn" id="next" onclick="go(1)">→</button>
+</div>
+
+<div class="kh">
+  <span class="k">←</span><span class="k">→</span>&nbsp;navegar
+</div>
+
+<script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+const track  = document.getElementById('track');
+const pbar   = document.getElementById('pbar');
+const cnt    = document.getElementById('cnt');
+const total  = slides.length;
+let cur = 0, busy = false;
+
+// Build pips
+slides.forEach((_, i) => {
+  const p = document.createElement('div');
+  p.className = 'pip' + (i === 0 ? ' on' : '');
+  p.onclick = () => goTo(i);
+  track.appendChild(p);
+});
+
+function goTo(n) {
+  if (busy || n === cur || n < 0 || n >= total) return;
+  busy = true;
+
+  slides[cur].classList.add('leaving');
+  const prev = cur;
+
+  setTimeout(() => {
+    slides[prev].classList.remove('active', 'leaving');
+    cur = n;
+
+    // Reset animations
+    slides[cur].querySelectorAll('.r').forEach(el => {
+      el.style.animation = 'none';
+      void el.offsetHeight;
+      el.style.animation = '';
+    });
+
+    slides[cur].classList.add('active');
+    ui();
+    setTimeout(() => { busy = false; }, 600);
+  }, 240);
+}
+
+function go(d) { goTo(cur + d); }
+
+function ui() {
+  document.querySelectorAll('.pip').forEach((p, i) => p.classList.toggle('on', i === cur));
+  document.getElementById('prev').disabled = cur === 0;
+  document.getElementById('next').disabled = cur === total - 1;
+  cnt.textContent = String(cur + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+  pbar.style.width = ((cur + 1) / total * 100) + '%';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+});
+
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => {
+  const d = tx - e.changedTouches[0].clientX;
+  if (Math.abs(d) > 50) go(d > 0 ? 1 : -1);
+});
+
+ui();
+</script>
+</body>
+</html>

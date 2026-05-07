@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor de Evolução — Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:     #0B0907;
+  --bg2:    #141009;
+  --bg3:    #1D1710;
+  --cream:  #F2E8D4;
+  --cream2: #C8B898;
+  --muted:  #8A7A60;
+  --gold:   #C9A84C;
+  --border: rgba(255,255,255,0.065);
+  --bord-g: rgba(201,168,76,0.2);
+  --tab-h:  72px;
+}
+html { -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+
+body {
+  background:radial-gradient(ellipse 70% 50% at 35% 25%,#1C1108 0%,#070503 100%);
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; font-family:'Inter',sans-serif;
+}
+
+/* ── Phone ─────────────────────────────────── */
+.phone {
+  width:390px; height:844px;
+  background:var(--bg); border-radius:52px;
+  overflow:hidden; position:relative;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 60px 120px rgba(0,0,0,.95),
+    0 0 80px rgba(201,168,76,.06),
+    inset 0 1px 0 rgba(255,255,255,.06);
+}
+.phone::before {
+  content:''; position:absolute; top:14px; left:50%;
+  transform:translateX(-50%);
+  width:118px; height:34px; background:#070503; border-radius:20px; z-index:100;
+}
+
+/* ── Screens ─────────────────────────────── */
+.screen {
+  position:absolute; inset:0;
+  opacity:0; transform:translateX(20px) scale(.99);
+  pointer-events:none;
+  transition:opacity .38s cubic-bezier(.4,0,.2,1), transform .38s cubic-bezier(.4,0,.2,1);
+}
+.screen.active { opacity:1; transform:translateX(0) scale(1); pointer-events:all; }
+
+/* ══════════════════════════════════════════
+   HOME
+══════════════════════════════════════════ */
+#home { display:flex; flex-direction:column; }
+
+.home-scroll {
+  flex:1; overflow-y:auto; scrollbar-width:none;
+  padding:0 24px 20px;
+}
+.home-scroll::-webkit-scrollbar { display:none; }
+
+/* Greeting */
+.greeting-row {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom:28px; padding-top:10px;
+}
+.g-label { font-size:11px; color:var(--muted); letter-spacing:.05em; margin-bottom:4px; }
+.g-name {
+  font-family:'Playfair Display',serif;
+  font-size:27px; color:var(--cream);
+  letter-spacing:-.02em; line-height:1.2;
+}
+.notif {
+  width:40px; height:40px;
+  background:linear-gradient(160deg,var(--bg2),#110D07);
+  border-radius:13px; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; position:relative;
+  transition:border-color .2s;
+}
+.notif:hover { border-color:var(--bord-g); }
+.n-dot {
+  position:absolute; top:9px; right:9px;
+  width:7px; height:7px;
+  background:var(--gold); border-radius:50%;
+  border:1.5px solid var(--bg);
+}
+
+/* Section label */
+.s-lbl {
+  font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:12px; opacity:.65;
+}
+
+/* Book card */
+.book-card {
+  border-radius:22px; margin-bottom:12px;
+  position:relative; overflow:hidden; cursor:pointer;
+  transition:transform .2s, box-shadow .2s;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+}
+.book-card:hover { transform:translateY(-2px); box-shadow:0 14px 44px rgba(0,0,0,.7); }
+.book-card:active { transform:scale(.985); }
+.book-bg {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,#2C4A3E 0%,#1A3028 100%);
+}
+.book-bg::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.55) 100%);
+}
+.book-inner { position:relative; z-index:1; padding:22px; }
+.bc-tag {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:rgba(201,168,76,.9);
+  background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.2);
+  border-radius:6px; padding:4px 9px; margin-bottom:44px;
+}
+.bc-dot { width:5px; height:5px; background:var(--gold); border-radius:50%; animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+.bc-title {
+  font-family:'Playfair Display',serif;
+  font-size:20px; color:#F2E8D4; line-height:1.3; margin-bottom:2px;
+  letter-spacing:-.01em;
+}
+.bc-author { font-size:11.5px; color:rgba(201,168,76,.7); margin-bottom:18px; letter-spacing:.04em; }
+.progress-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.p-label { font-size:12px; color:rgba(242,232,212,.55); }
+.p-pct { font-size:12px; font-weight:600; color:var(--gold); }
+.prog-bar { height:3px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; margin-bottom:18px; }
+.prog-fill { height:100%; background:linear-gradient(90deg,var(--gold),#D4B555); border-radius:2px; width:0; transition:width 1.2s cubic-bezier(.4,0,.2,1) .4s; }
+.bc-ctas { display:flex; gap:10px; align-items:center; }
+.bc-cta {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(201,168,76,.14); border:1px solid rgba(201,168,76,.28);
+  border-radius:10px; padding:10px 14px;
+  color:var(--gold); font-size:13px; font-weight:500; cursor:pointer;
+  transition:background .2s;
+}
+.bc-cta:hover { background:rgba(201,168,76,.2); }
+.bc-cta-dim {
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+  color:rgba(242,232,212,.4);
+}
+.bc-cta-dim:hover { background:rgba(255,255,255,.08); }
+
+/* Stats */
+.stats-row { display:flex; gap:10px; margin-bottom:22px; }
+.stat {
+  flex:1; padding:14px 12px;
+  background:linear-gradient(160deg,var(--bg2),#110D07);
+  border:1px solid var(--border); border-radius:16px;
+  display:flex; align-items:center; gap:9px;
+  transition:border-color .2s;
+}
+.stat:hover { border-color:var(--bord-g); }
+.stat-ico { font-size:17px; flex-shrink:0; }
+.stat-val { font-size:13.5px; font-weight:600; color:var(--cream); line-height:1.2; }
+.stat-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+
+/* AI nudge */
+.nudge {
+  background:linear-gradient(160deg,var(--bg2),#110D07);
+  border:1px solid rgba(201,168,76,.18);
+  border-radius:16px; padding:14px 16px;
+  display:flex; align-items:flex-start; gap:12px; margin-bottom:10px;
+  transition:border-color .2s;
+}
+.nudge:hover { border-color:rgba(201,168,76,.3); }
+.nudge-av {
+  width:34px; height:34px;
+  background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.06));
+  border-radius:10px; border:1px solid rgba(201,168,76,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; flex-shrink:0;
+}
+.nudge-lbl { font-size:9px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); opacity:.75; margin-bottom:4px; }
+.nudge-txt { font-size:13px; color:var(--cream); line-height:1.55; }
+.nudge-time { font-size:11px; color:var(--muted); margin-top:4px; opacity:.6; }
+
+/* Sala card */
+.sala-card {
+  background:linear-gradient(160deg,var(--bg2),#110D07);
+  border:1px solid var(--border); border-radius:16px;
+  padding:16px; margin-bottom:10px; cursor:pointer;
+  transition:border-color .2s, background .2s;
+}
+.sala-card:hover { border-color:var(--bord-g); background:linear-gradient(160deg,var(--bg3),#191208); }
+.sala-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.sala-left { display:flex; align-items:center; gap:9px; }
+.sala-ico {
+  width:32px; height:32px;
+  background:rgba(201,168,76,.1); border-radius:9px;
+  display:flex; align-items:center; justify-content:center; font-size:14px;
+}
+.sala-name { font-size:14px; font-weight:600; color:var(--cream); }
+.badge {
+  background:linear-gradient(135deg,var(--gold),#BB9228);
+  color:var(--bg); font-size:10.5px; font-weight:700;
+  border-radius:20px; padding:2px 9px;
+  box-shadow:0 2px 8px rgba(201,168,76,.3);
+}
+.sala-prev { font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sala-prev span { color:rgba(242,232,212,.6); }
+
+/* Tab bar */
+.tab-bar {
+  position:absolute; bottom:0; left:0; right:0; height:var(--tab-h);
+  background:rgba(11,9,7,.96); backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,.05);
+  display:flex; align-items:center; justify-content:space-around;
+  padding:0 16px 12px; z-index:50;
+}
+.tab { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:.38; transition:opacity .2s; flex:1; }
+.tab.on { opacity:1; }
+.tab-ico { font-size:20px; }
+.tab-lbl { font-size:10px; color:var(--muted); font-weight:500; letter-spacing:.04em; }
+.tab.on .tab-lbl { color:var(--gold); }
+
+/* ══════════════════════════════════════════
+   SALA DE LEITURA
+══════════════════════════════════════════ */
+#sala { display:flex; flex-direction:column; }
+
+.chat-hdr {
+  padding:62px 20px 14px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  background:var(--bg); flex-shrink:0;
+}
+.chat-back {
+  display:flex; align-items:center; gap:5px;
+  color:var(--gold); font-size:13px; cursor:pointer;
+  margin-bottom:12px; background:none; border:none;
+  font-family:'Inter',sans-serif; transition:opacity .2s;
+}
+.chat-back:hover { opacity:.75; }
+.chat-book {
+  font-family:'Playfair Display',serif;
+  font-size:15px; color:var(--cream); margin-bottom:3px; letter-spacing:-.005em;
+}
+.chat-meta { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+.online-dot { width:5px; height:5px; background:#4CAF50; border-radius:50%; }
+
+/* Messages */
+.chat-msgs {
+  flex:1; overflow-y:auto; padding:16px 16px 10px;
+  scrollbar-width:none; display:flex; flex-direction:column; gap:3px;
+}
+.chat-msgs::-webkit-scrollbar { display:none; }
+
+.day-sep {
+  text-align:center; font-size:10.5px; color:var(--muted);
+  letter-spacing:.1em; margin:10px 0 8px; opacity:.5;
+  text-transform:uppercase;
+}
+
+/* AI bubble */
+.msg-ai { display:flex; align-items:flex-start; gap:9px; margin-bottom:12px; }
+.ai-av {
+  width:30px; height:30px;
+  background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(201,168,76,.06));
+  border-radius:9px; border:1px solid rgba(201,168,76,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; flex-shrink:0;
+}
+.ai-nm { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); opacity:.75; margin-bottom:5px; }
+.ai-bbl {
+  background:linear-gradient(160deg,rgba(201,168,76,.08),rgba(201,168,76,.03));
+  border:1px solid rgba(201,168,76,.14);
+  border-radius:4px 14px 14px 14px;
+  padding:11px 14px; font-size:13.5px; color:var(--cream);
+  line-height:1.58; max-width:280px;
+}
+.msg-time { font-size:10px; color:var(--muted); margin-top:4px; opacity:.55; }
+
+/* Reader bubble */
+.msg-rd { display:flex; align-items:flex-start; gap:9px; margin-bottom:12px; }
+.rd-av {
+  width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:600; color:var(--bg); flex-shrink:0;
+}
+.rd-nm { font-size:11px; font-weight:500; color:var(--muted); margin-bottom:4px; }
+.rd-bbl {
+  background:linear-gradient(160deg,var(--bg2),#110D07);
+  border:1px solid var(--border);
+  border-radius:4px 14px 14px 14px;
+  padding:11px 14px; font-size:13.5px; color:var(--cream);
+  line-height:1.58; max-width:280px;
+}
+
+/* Own */
+.msg-own { display:flex; justify-content:flex-end; margin-bottom:12px; }
+.own-bbl {
+  background:linear-gradient(160deg,rgba(201,168,76,.12),rgba(201,168,76,.05));
+  border:1px solid rgba(201,168,76,.2);
+  border-radius:14px 4px 14px 14px;
+  padding:11px 14px; font-size:13.5px; color:var(--cream);
+  line-height:1.58; max-width:260px;
+}
+
+/* Chat input */
+.chat-bar {
+  padding:10px 16px 22px; background:var(--bg);
+  border-top:1px solid rgba(255,255,255,.04);
+  display:flex; align-items:center; gap:10px; flex-shrink:0;
+}
+.chat-inp {
+  flex:1;
+  background:linear-gradient(160deg,var(--bg2),#110D07);
+  border:1.5px solid var(--border); border-radius:24px;
+  padding:12px 18px; color:var(--cream);
+  font-size:14px; font-family:'Inter',sans-serif;
+  outline:none; transition:border-color .2s, box-shadow .2s;
+}
+.chat-inp::placeholder { color:rgba(138,122,96,.3); }
+.chat-inp:focus { border-color:rgba(201,168,76,.35); box-shadow:0 0 0 3px rgba(201,168,76,.06); }
+.send {
+  width:42px; height:42px;
+  background:linear-gradient(135deg,#D4B555,#BB9228);
+  border:none; border-radius:50%; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:filter .2s, transform .15s;
+  box-shadow:0 3px 12px rgba(201,168,76,.3);
+}
+.send:hover { filter:brightness(1.1); transform:scale(1.05); }
+.send svg { width:15px; height:15px; fill:var(--bg); }
+
+/* Responsive */
+@media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
+@media (max-height:800px) { .phone { transform:scale(.83); } }
+@media (max-width:420px)  { .phone { width:100vw; height:100vh; border-radius:0; transform:none !important; } }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ══ HOME ═══════════════════════════════════ -->
+  <div class="screen active" id="home">
+    <div class="home-scroll">
+
+      <div class="greeting-row">
+        <div>
+          <p class="g-label">Boa tarde</p>
+          <h1 class="g-name">Ana</h1>
+        </div>
+        <div class="notif"><span style="font-size:17px">🔔</span><span class="n-dot"></span></div>
+      </div>
+
+      <p class="s-lbl">Leitura atual</p>
+      <div class="book-card" onclick="go('sala')">
+        <div class="book-bg"></div>
+        <div class="book-inner">
+          <span class="bc-tag"><span class="bc-dot"></span>Em andamento</span>
+          <p class="bc-title">Jogos Finitos<br>e Infinitos</p>
+          <p class="bc-author">James P. Carse</p>
+          <div class="progress-row">
+            <span class="p-label">Página 47 de 178</span>
+            <span class="p-pct">26%</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+          <div class="bc-ctas">
+            <div class="bc-cta">Continuar lendo →</div>
+            <div class="bc-cta bc-cta-dim"
+              onclick="event.stopPropagation();window.location.href='mentor-evolucao-conclusao.html'">
+              Concluir ✓
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat"><span class="stat-ico">🔥</span><div><p class="stat-val">5 dias</p><p class="stat-sub">seguidos</p></div></div>
+        <div class="stat"><span class="stat-ico">⏱</span><div><p class="stat-val">15 min</p><p class="stat-sub">hoje</p></div></div>
+        <div class="stat"><span class="stat-ico">📚</span><div><p class="stat-val">1 livro</p><p class="stat-sub">em 2026</p></div></div>
+      </div>
+
+      <p class="s-lbl">IA Sócrates</p>
+      <div class="nudge">
+        <div class="nudge-av">📖</div>
+        <div>
+          <p class="nudge-lbl">IA Sócrates</p>
+          <p class="nudge-txt">Qual página você está? A Carla já chegou na 52 😊</p>
+          <p class="nudge-time">há 2 horas</p>
+        </div>
+      </div>
+
+      <p class="s-lbl" style="margin-top:14px">Sua sala</p>
+      <div class="sala-card" onclick="go('sala')">
+        <div class="sala-hdr">
+          <div class="sala-left">
+            <div class="sala-ico">⚡</div>
+            <p class="sala-name">Grupo Alavanca</p>
+          </div>
+          <span class="badge">3 novas</span>
+        </div>
+        <p class="sala-prev"><span>Carla S.:</span> Passei uma reunião inteira hoje pensando nisso 😅</p>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab on"><span class="tab-ico">🏠</span><span class="tab-lbl">Início</span></div>
+      <div class="tab" onclick="go('sala')"><span class="tab-ico">💬</span><span class="tab-lbl">Sala</span></div>
+      <div class="tab"><span class="tab-ico">👤</span><span class="tab-lbl">Perfil</span></div>
+    </div>
+  </div>
+
+  <!-- ══ SALA ════════════════════════════════════ -->
+  <div class="screen" id="sala">
+    <div class="chat-hdr">
+      <button class="chat-back" onclick="go('home')">← Início</button>
+      <p class="chat-book">Jogos Finitos e Infinitos</p>
+      <p class="chat-meta"><span class="online-dot"></span>Grupo Alavanca · 4 leitoras ativas</p>
+    </div>
+
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="day-sep">Ontem</div>
+
+      <div class="msg-ai">
+        <div class="ai-av">📖</div>
+        <div><p class="ai-nm">IA Sócrates</p>
+          <div class="ai-bbl">Olá, pessoal! Alguém já começou? Me conta a primeira impressão 📖</div>
+          <p class="msg-time">18:32</p>
+        </div>
+      </div>
+      <div class="msg-rd">
+        <div class="rd-av" style="background:#4A7C6B">CS</div>
+        <div><p class="rd-nm">Carla S.</p>
+          <div class="rd-bbl">Comecei! Dois capítulos in — a distinção entre jogadores finitos e infinitos já mudou como vi minha reunião de hoje 🤯</div>
+          <p class="msg-time">19:15</p>
+        </div>
+      </div>
+      <div class="msg-rd">
+        <div class="rd-av" style="background:#6B4A7C">MT</div>
+        <div><p class="rd-nm">Mariana T.</p>
+          <div class="rd-bbl">Que livro denso. De um jeito bom. Me lembra Simon Sinek mas muito mais fundo</div>
+          <p class="msg-time">20:44</p>
+        </div>
+      </div>
+
+      <div class="day-sep">Hoje</div>
+
+      <div class="msg-ai">
+        <div class="ai-av">📖</div>
+        <div><p class="ai-nm">IA Sócrates</p>
+          <div class="ai-bbl">Qual página vocês estão? 📍</div>
+          <p class="msg-time">08:12</p>
+        </div>
+      </div>
+      <div class="msg-rd">
+        <div class="rd-av" style="background:#4A7C6B">CS</div>
+        <div><p class="rd-nm">Carla S.</p>
+          <div class="rd-bbl">Página 52! Não consigo parar</div>
+          <p class="msg-time">09:30</p>
+        </div>
+      </div>
+      <div class="msg-rd">
+        <div class="rd-av" style="background:#6B4A7C">MT</div>
+        <div><p class="rd-nm">Mariana T.</p>
+          <div class="rd-bbl">34 aqui... ando devagar mas cada parágrafo é rico</div>
+          <p class="msg-time">10:18</p>
+        </div>
+      </div>
+      <div class="msg-own">
+        <div>
+          <div class="own-bbl">Página 47! Esse conceito de jogos infinitos está mudando minha perspectiva sobre carreira</div>
+          <p class="msg-time" style="text-align:right">11:04</p>
+        </div>
+      </div>
+      <div class="msg-ai">
+        <div class="ai-av">📖</div>
+        <div><p class="ai-nm">IA Sócrates</p>
+          <div class="ai-bbl">Alguma conexão entre o que estão lendo e algo que viveram essa semana?</div>
+          <p class="msg-time">14:22</p>
+        </div>
+      </div>
+      <div class="msg-rd">
+        <div class="rd-av" style="background:#4A7C6B">CS</div>
+        <div><p class="rd-nm">Carla S.</p>
+          <div class="rd-bbl">Toda a minha semana! Passei uma reunião inteira pensando se estava em um jogo finito ou infinito 😅</div>
+          <p class="msg-time">15:47</p>
+        </div>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+
+    <div class="chat-bar">
+      <input class="chat-inp" type="text" placeholder="Responder ao grupo…" id="chat-inp" />
+      <button class="send" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+<script>
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='home') setTimeout(()=>{ const f=document.getElementById('prog-fill'); if(f) f.style.width='26%'; },120);
+  if(id==='sala') setTimeout(()=>{ const m=document.getElementById('chat-msgs'); if(m) m.scrollTop=m.scrollHeight; },50);
+}
+window.addEventListener('load',()=>{ setTimeout(()=>{ const f=document.getElementById('prog-fill'); if(f) f.style.width='26%'; },500); });
+function sendMsg() {
+  const inp=document.getElementById('chat-inp');
+  const v=inp.value.trim(); if(!v) return;
+  const msgs=document.getElementById('chat-msgs');
+  const now=new Date();
+  const t=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  const w=document.createElement('div'); w.className='msg-own'; w.style.marginBottom='12px';
+  w.innerHTML=`<div><div class="own-bbl">${v}</div><p class="msg-time" style="text-align:right">${t}</p></div>`;
+  msgs.appendChild(w); inp.value=''; msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    const r=document.createElement('div'); r.className='msg-ai'; r.style.marginBottom='12px';
+    r.innerHTML=`<div class="ai-av">📖</div><div><p class="ai-nm">IA Sócrates</p><div class="ai-bbl">Quer trocar ideias com mais alguém da sala sobre isso? ✨</div><p class="msg-time">${t}</p></div>`;
+    msgs.appendChild(r); msgs.scrollTop=msgs.scrollHeight;
+  },1800);
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Enter') sendMsg(); });
+</script>
+</body>
+</html>
