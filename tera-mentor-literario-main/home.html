@@ -629,7 +629,7 @@ function renderBooks() {
         </div>
         ${done ? '' : `
           <div class="bc-ctas">
-            <div class="bc-cta">Nova recomendação</div>
+            <div class="bc-cta" onclick="event.stopPropagation();window.location.href='recomendacao.html'">Nova recomendação</div>
             <div class="bc-cta bc-cta-dim" onclick="event.stopPropagation();finishBook(${i})">Concluir ✓</div>
           </div>`}
       </div>`;
