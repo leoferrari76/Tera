@@ -456,10 +456,18 @@ body {
   display:flex; align-items:center; justify-content:space-around;
   padding:0 16px 12px; z-index:60;
 }
-.tab { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:.35; transition:opacity .2s; flex:1; }
+.tab { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:.35; transition:opacity .2s; flex:1; color:var(--cream); }
 .tab.on { opacity:1; }
-.tab-ico { font-size:20px; }
+.tab.on .tab-lbl { color:var(--gold); }
+.tab.on .tab-ico svg { stroke:var(--gold); }
+.tab-ico { display:flex; align-items:center; justify-content:center; }
+.tab-ico svg { width:20px; height:20px; stroke-width:1.75; }
 .tab-lbl { font-size:10px; color:var(--muted); font-weight:500; letter-spacing:.04em; }
+
+/* Lucide icon sizing */
+.badge-icon svg { width:18px; height:18px; stroke-width:1.5; }
+.resp-av svg    { width:20px; height:20px; stroke-width:1.75; }
+.g-icon svg     { width:16px; height:16px; stroke-width:1.75; }
 
 /* Responsive */
 @media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
@@ -479,7 +487,7 @@ body {
     <div class="glow-outer"></div>
     <div class="glow-inner"></div>
 
-    <div class="badge-icon">✦</div>
+    <div class="badge-icon"><i data-lucide="sparkles"></i></div>
 
     <div class="victory-book" id="completed-cover" style="background:linear-gradient(135deg,#2C4A3E,#1A3028)">
       <div class="vb-spine"></div>
@@ -557,7 +565,7 @@ body {
     <div style="padding:72px 32px 96px; display:flex; flex-direction:column; min-height:100%;">
       <button class="back" style="position:static;margin-bottom:20px" onclick="go('s2')">← Editar reflexão</button>
       <div class="resp-hdr">
-        <div class="resp-av">📖</div>
+        <div class="resp-av"><i data-lucide="book-open"></i></div>
         <div><p class="resp-nm">IA Travez</p><p class="resp-sub">Leu sua reflexão</p></div>
       </div>
       <div class="echo" id="echo">"Sempre joguei para ganhar quando devia estar jogando para continuar…"</div>
@@ -593,7 +601,7 @@ body {
     <div class="why-rule"></div>
     <p class="next-why">Você saiu dos Jogos com uma nova estratégia de longo prazo. Ryan Holiday vai te mostrar o que pode sabotá-la — por dentro.</p>
     <div class="group-card">
-      <div class="g-icon">⚡</div>
+      <div class="g-icon"><i data-lucide="zap"></i></div>
       <div><p class="g-name">Grupo Alavanca</p><p class="g-desc">Continua com o mesmo grupo · 30 min+/dia</p></div>
     </div>
     <button class="btn" style="width:100%;margin-bottom:10px" onclick="window.location.href='home.html'">Aceitar esta leitura</button>
@@ -602,9 +610,9 @@ body {
 
   <!-- Tab bar — persistente -->
   <div class="tab-bar">
-    <div class="tab on" onclick="window.location.href='home.html'"><span class="tab-ico">🏠</span><span class="tab-lbl">Início</span></div>
-    <div class="tab" onclick="window.location.href='home.html'"><span class="tab-ico">💬</span><span class="tab-lbl">Sala</span></div>
-    <div class="tab"><span class="tab-ico">👤</span><span class="tab-lbl">Perfil</span></div>
+    <div class="tab on" onclick="window.location.href='home.html'"><span class="tab-ico"><i data-lucide="house"></i></span><span class="tab-lbl">Início</span></div>
+    <div class="tab" onclick="window.location.href='home.html'"><span class="tab-ico"><i data-lucide="message-circle"></i></span><span class="tab-lbl">Sala</span></div>
+    <div class="tab"><span class="tab-ico"><i data-lucide="user"></i></span><span class="tab-lbl">Perfil</span></div>
   </div>
 
 </div>
@@ -756,7 +764,9 @@ window.addEventListener('load',()=>{
   applyCompletedBook();
   const v=document.getElementById('reflection').value;
   document.getElementById('char-c').textContent=v.length+' caracteres';
+  lucide.createIcons();
 });
 </script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </body>
 </html>

@@ -285,11 +285,19 @@ body {
   display:flex; align-items:center; justify-content:space-around;
   padding:0 16px 12px; z-index:60;
 }
-.tab { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:.35; transition:opacity .2s; flex:1; }
+.tab { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:.35; transition:opacity .2s; flex:1; color:var(--cream); }
 .tab.on { opacity:1; }
-.tab-ico { font-size:20px; }
-.tab-lbl { font-size:10px; color:var(--muted); font-weight:500; letter-spacing:.04em; }
 .tab.on .tab-lbl { color:var(--gold); }
+.tab.on .tab-ico svg { stroke:var(--gold); }
+.tab-ico { display:flex; align-items:center; justify-content:center; }
+.tab-ico svg { width:20px; height:20px; stroke-width:1.75; }
+.tab-lbl { font-size:10px; color:var(--muted); font-weight:500; letter-spacing:.04em; }
+
+/* Lucide icon sizing */
+.stat-ico svg   { width:16px; height:16px; stroke-width:1.75; }
+.notif svg      { width:16px; height:16px; stroke-width:1.75; }
+.ai-av svg      { width:14px; height:14px; stroke-width:1.75; }
+.sala-ico svg   { width:14px; height:14px; stroke-width:1.75; }
 
 /* ══════════════════════════════════════════
    SALA DE LEITURA
@@ -422,7 +430,7 @@ body {
           <p class="g-label">Boa tarde</p>
           <h1 class="g-name">Ana</h1>
         </div>
-        <div class="notif"><span style="font-size:17px">🔔</span><span class="n-dot"></span></div>
+        <div class="notif"><i data-lucide="bell"></i><span class="n-dot"></span></div>
       </div>
 
       <p class="s-lbl">Leitura atual</p>
@@ -436,16 +444,16 @@ body {
       </div>
 
       <div class="stats-row">
-        <div class="stat"><span class="stat-ico">🔥</span><div><p class="stat-val">5 dias</p><p class="stat-sub">seguidos</p></div></div>
-        <div class="stat"><span class="stat-ico">⏱</span><div><p class="stat-val">15 min</p><p class="stat-sub">hoje</p></div></div>
-        <div class="stat"><span class="stat-ico">📚</span><div><p class="stat-val">1 livro</p><p class="stat-sub">em 2026</p></div></div>
+        <div class="stat"><span class="stat-ico"><i data-lucide="flame"></i></span><div><p class="stat-val">5 dias</p><p class="stat-sub">seguidos</p></div></div>
+        <div class="stat"><span class="stat-ico"><i data-lucide="timer"></i></span><div><p class="stat-val">15 min</p><p class="stat-sub">hoje</p></div></div>
+        <div class="stat"><span class="stat-ico"><i data-lucide="book-marked"></i></span><div><p class="stat-val">1 livro</p><p class="stat-sub">em 2026</p></div></div>
       </div>
 
       <p class="s-lbl">Sua sala</p>
       <div class="sala-card" onclick="go('sala')">
         <div class="sala-hdr">
           <div class="sala-left">
-            <div class="sala-ico">⚡</div>
+            <div class="sala-ico"><i data-lucide="zap"></i></div>
             <p class="sala-name">Grupo Alavanca</p>
           </div>
           <span class="badge">3 novas</span>
@@ -469,7 +477,7 @@ body {
       <div class="day-sep">Ontem</div>
 
       <div class="msg-ai">
-        <div class="ai-av">📖</div>
+        <div class="ai-av"><i data-lucide="book-open"></i></div>
         <div><p class="ai-nm">IA Travez</p>
           <div class="ai-bbl">Olá, pessoal! Alguém já começou? Me conta a primeira impressão 📖</div>
           <p class="msg-time">18:32</p>
@@ -493,7 +501,7 @@ body {
       <div class="day-sep">Hoje</div>
 
       <div class="msg-ai">
-        <div class="ai-av">📖</div>
+        <div class="ai-av"><i data-lucide="book-open"></i></div>
         <div><p class="ai-nm">IA Travez</p>
           <div class="ai-bbl">Qual página vocês estão? 📍</div>
           <p class="msg-time">08:12</p>
@@ -520,7 +528,7 @@ body {
         </div>
       </div>
       <div class="msg-ai">
-        <div class="ai-av">📖</div>
+        <div class="ai-av"><i data-lucide="book-open"></i></div>
         <div><p class="ai-nm">IA Travez</p>
           <div class="ai-bbl">Alguma conexão entre o que estão lendo e algo que viveram essa semana?</div>
           <p class="msg-time">14:22</p>
@@ -546,9 +554,9 @@ body {
 
   <!-- Tab bar — persistente em todas as telas -->
   <div class="tab-bar">
-    <div class="tab on" id="tab-home" onclick="go('home')"><span class="tab-ico">🏠</span><span class="tab-lbl">Início</span></div>
-    <div class="tab" id="tab-sala" onclick="go('sala')"><span class="tab-ico">💬</span><span class="tab-lbl">Sala</span></div>
-    <div class="tab" id="tab-perfil"><span class="tab-ico">👤</span><span class="tab-lbl">Perfil</span></div>
+    <div class="tab on" id="tab-home" onclick="go('home')"><span class="tab-ico"><i data-lucide="house"></i></span><span class="tab-lbl">Início</span></div>
+    <div class="tab" id="tab-sala" onclick="go('sala')"><span class="tab-ico"><i data-lucide="message-circle"></i></span><span class="tab-lbl">Sala</span></div>
+    <div class="tab" id="tab-perfil"><span class="tab-ico"><i data-lucide="user"></i></span><span class="tab-lbl">Perfil</span></div>
   </div>
 
 </div>
@@ -707,11 +715,13 @@ function sendMsg() {
   msgs.appendChild(w); inp.value=''; msgs.scrollTop=msgs.scrollHeight;
   setTimeout(()=>{
     const r=document.createElement('div'); r.className='msg-ai'; r.style.marginBottom='12px';
-    r.innerHTML=`<div class="ai-av">📖</div><div><p class="ai-nm">IA Travez</p><div class="ai-bbl">Quer trocar ideias com mais alguém da sala sobre isso? ✨</div><p class="msg-time">${t}</p></div>`;
-    msgs.appendChild(r); msgs.scrollTop=msgs.scrollHeight;
+    r.innerHTML=`<div class="ai-av"><i data-lucide="book-open"></i></div><div><p class="ai-nm">IA Travez</p><div class="ai-bbl">Quer trocar ideias com mais alguém da sala sobre isso? ✨</div><p class="msg-time">${t}</p></div>`;
+    msgs.appendChild(r); lucide.createIcons({el:r}); msgs.scrollTop=msgs.scrollHeight;
   },1800);
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Enter') sendMsg(); });
+document.addEventListener('DOMContentLoaded',()=>lucide.createIcons());
 </script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </body>
 </html>
