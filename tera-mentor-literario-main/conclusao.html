@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travez — Conclusão</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:     #F3E8DB;
+  --bg2:    #FFFFFF;
+  --bg3:    #FAF6F1;
+  --cream:  #1E3A2F;
+  --cream2: #2D5243;
+  --muted:  #7A8A70;
+  --gold:   #C26A3A;
+  --bord-g: rgba(194,106,58,.20);
+  --border: rgba(30,58,47,.08);
+}
+html { -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+
+body {
+  background:radial-gradient(ellipse 70% 50% at 30% 20%,#DDD0C4 0%,#C3B49E 100%);
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; font-family:'Inter',sans-serif;
+}
+
+.phone {
+  width:390px; height:844px; background:var(--bg);
+  border-radius:52px; overflow:hidden; position:relative;
+  box-shadow:
+    0 0 0 1px rgba(30,58,47,.06),
+    0 60px 120px rgba(30,58,47,.28),
+    0 0 80px rgba(194,106,58,.08),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+.phone::before {
+  content:''; position:absolute; top:14px; left:50%;
+  transform:translateX(-50%);
+  width:118px; height:34px; background:#E2D6C8; border-radius:20px; z-index:100;
+}
+
+.screen {
+  position:absolute; inset:0;
+  opacity:0; transform:translateX(20px) scale(.99);
+  pointer-events:none;
+  transition:opacity .4s cubic-bezier(.4,0,.2,1), transform .4s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto; scrollbar-width:none;
+}
+.screen::-webkit-scrollbar { display:none; }
+.screen.active { opacity:1; transform:translateX(0) scale(1); pointer-events:all; }
+
+/* ── Shared ───────────────────────────── */
+.back {
+  position:absolute; top:58px; left:24px; z-index:10;
+  display:inline-flex; align-items:center; gap:5px;
+  color:var(--muted); font-size:13px; cursor:pointer;
+  background:none; border:none; font-family:'Inter',sans-serif; transition:color .2s;
+}
+.back:hover { color:var(--cream2); }
+
+.btn {
+  width:100%; padding:17px;
+  background:linear-gradient(135deg,#C26A3A 0%,#9E5228 100%);
+  border:none; border-radius:15px;
+  color:#F3E8DB; font-size:15px; font-weight:600;
+  font-family:'Inter',sans-serif; cursor:pointer;
+  transition:filter .2s, transform .15s;
+  box-shadow:0 4px 20px rgba(194,106,58,.30), inset 0 1px 0 rgba(255,255,255,.15);
+  letter-spacing:-.01em; flex-shrink:0;
+}
+.btn:hover { filter:brightness(1.06); transform:translateY(-1px); }
+.btn:active { transform:scale(.98); }
+
+.btn-ghost {
+  width:100%; padding:13px; background:none; border:none;
+  color:var(--muted); font-size:13.5px;
+  font-family:'Inter',sans-serif; cursor:pointer;
+  text-align:center; margin-top:8px; transition:color .2s; flex-shrink:0;
+}
+.btn-ghost:hover { color:var(--cream2); }
+
+/* ══════════════════════════════════════════
+   S1 — CONQUISTA
+══════════════════════════════════════════ */
+#s1 {
+  display:flex; flex-direction:column; align-items:center;
+  padding:72px 32px 46px; text-align:center; overflow:hidden;
+}
+
+/* Glow layers */
+.glow-outer {
+  position:absolute; top:80px; left:50%; transform:translateX(-50%);
+  width:320px; height:320px; border-radius:50%;
+  background:radial-gradient(circle, rgba(194,106,58,.07) 0%, transparent 70%);
+  animation:breathe 4s ease-in-out infinite;
+  pointer-events:none;
+}
+.glow-inner {
+  position:absolute; top:130px; left:50%; transform:translateX(-50%);
+  width:160px; height:160px; border-radius:50%;
+  background:radial-gradient(circle, rgba(194,106,58,.12) 0%, transparent 70%);
+  animation:breathe 4s ease-in-out infinite .5s;
+  pointer-events:none;
+}
+@keyframes breathe {
+  0%,100% { transform:translateX(-50%) scale(1);   opacity:.8; }
+  50%      { transform:translateX(-50%) scale(1.18); opacity:1; }
+}
+
+/* Book cover — victory */
+.victory-book {
+  width:88px; height:126px;
+  border-radius:3px 8px 8px 3px;
+  position:relative; z-index:1;
+  margin-bottom:24px;
+  display:flex; align-items:flex-end; padding:8px;
+  overflow:hidden;
+  filter:
+    drop-shadow(-5px 8px 20px rgba(0,0,0,.75))
+    drop-shadow(-2px 2px 6px rgba(0,0,0,.5))
+    drop-shadow(0 0 30px rgba(201,168,76,.15));
+  transition:filter .3s;
+}
+.victory-book:hover { filter: drop-shadow(-5px 8px 20px rgba(0,0,0,.75)) drop-shadow(-2px 2px 6px rgba(0,0,0,.5)) drop-shadow(0 0 40px rgba(201,168,76,.25)); }
+.vb-spine {
+  position:absolute; left:0; top:0; bottom:0;
+  width:6px; background:rgba(0,0,0,.45);
+  border-radius:3px 0 0 3px;
+}
+.vb-title {
+  font-family:'Lora',serif;
+  font-size:10px; color:rgba(255,255,255,.85);
+  line-height:1.4; position:relative; z-index:1;
+}
+
+.badge-icon {
+  width:40px; height:40px; z-index:1;
+  background:linear-gradient(135deg,rgba(194,106,58,.16),rgba(194,106,58,.04));
+  border:1.5px solid rgba(194,106,58,.28);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; margin-bottom:20px;
+  box-shadow:0 0 20px rgba(194,106,58,.10);
+}
+
+.c-lbl {
+  font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); opacity:.75; margin-bottom:10px; z-index:1;
+}
+.c-title {
+  font-family:'Lora',serif;
+  font-size:30px; line-height:1.2; letter-spacing:-.02em;
+  color:var(--cream); margin-bottom:6px; z-index:1;
+}
+.c-book { font-size:12.5px; color:var(--muted); margin-bottom:30px; z-index:1; }
+
+/* Stats strip */
+.stats-strip {
+  display:flex; width:100%;
+  background:var(--bg2);
+  border:1px solid var(--border); border-radius:18px;
+  overflow:hidden; margin-bottom:28px; z-index:1;
+  box-shadow:0 2px 10px rgba(30,58,47,.06);
+}
+.stat-cell {
+  flex:1; padding:16px 10px; text-align:center;
+  border-right:1px solid rgba(255,255,255,.04);
+}
+.stat-cell:last-child { border-right:none; }
+.sv { font-size:18px; font-weight:600; color:var(--cream); margin-bottom:3px; letter-spacing:-.02em; }
+.ss { font-size:11px; color:var(--muted); }
+
+.c-sub {
+  font-size:13.5px; color:var(--muted); line-height:1.8;
+  margin-bottom:28px; font-style:italic; z-index:1;
+}
+
+#s-deep { padding:72px 32px 44px; display:flex; flex-direction:column; }
+.deep-intro {
+  font-size:13.5px; color:var(--muted); line-height:1.75;
+  margin-bottom:20px;
+}
+.deep-list {
+  display:flex; flex-direction:column; gap:12px;
+  margin-bottom:22px;
+}
+.deep-card {
+  background:var(--bg2);
+  border:1px solid var(--border); border-radius:16px;
+  padding:15px 16px;
+  box-shadow:0 2px 10px rgba(30,58,47,.05);
+}
+.deep-card:nth-child(2n) {
+  background:var(--bg3);
+}
+.deep-title {
+  font-size:9px; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--gold); opacity:.78; margin-bottom:8px;
+}
+.deep-text {
+  font-size:13px; color:var(--cream2); line-height:1.65;
+}
+.deep-text ul {
+  list-style:none; display:flex; flex-direction:column; gap:7px;
+}
+.deep-text li {
+  position:relative; padding-left:14px;
+}
+.deep-text li::before {
+  content:''; position:absolute; left:0; top:.72em;
+  width:4px; height:4px; border-radius:50%; background:var(--gold);
+  opacity:.75;
+}
+.next-step {
+  background:linear-gradient(160deg,rgba(201,168,76,.07),rgba(201,168,76,.02));
+  border:1px solid rgba(201,168,76,.16); border-radius:18px;
+  padding:16px; margin-bottom:4px;
+}
+.next-step-title {
+  font-family:'Lora',serif;
+  font-size:18px; line-height:1.25; letter-spacing:-.01em;
+  color:var(--cream); margin-bottom:14px; font-style:italic;
+}
+.path-list { display:flex; flex-direction:column; gap:12px; }
+.path-card {
+  background:var(--bg2);
+  border:1px solid var(--border); border-radius:15px;
+  padding:14px; box-shadow:0 2px 10px rgba(30,58,47,.05);
+}
+.path-kicker {
+  font-size:8.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold); opacity:.76; margin-bottom:7px;
+}
+.path-desc {
+  font-size:12.5px; color:var(--muted); line-height:1.6;
+  margin-bottom:12px;
+}
+.path-btn {
+  width:100%; padding:13px 14px;
+  background:linear-gradient(135deg,#C26A3A 0%,#9E5228 100%);
+  border:none; border-radius:13px;
+  color:#F3E8DB; font-size:13.5px; font-weight:600;
+  font-family:'Inter',sans-serif; cursor:pointer;
+  transition:filter .2s, transform .15s;
+  box-shadow:0 4px 16px rgba(194,106,58,.26), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.path-btn:hover { filter:brightness(1.06); transform:translateY(-1px); }
+.path-btn:active { transform:scale(.98); }
+/* ══════════════════════════════════════════
+   S2 — REFLEXÃO
+══════════════════════════════════════════ */
+#s2 { padding:72px 32px 44px; display:flex; flex-direction:column; }
+
+.ai-lbl {
+  font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); opacity:.75; margin-bottom:10px;
+}
+.ai-msg {
+  font-family:'Lora',serif;
+  font-size:22px; line-height:1.48; letter-spacing:-.01em;
+  color:var(--cream); margin-bottom:22px;
+}
+
+.chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.chip {
+  background:linear-gradient(160deg,var(--bg2),#110D07);
+  border:1px solid var(--border); border-radius:20px;
+  padding:6px 13px; font-size:12px; color:var(--muted);
+  cursor:pointer; transition:border-color .2s, color .2s, background .2s;
+  user-select:none;
+}
+.chip:hover { border-color:var(--bord-g); color:var(--cream2); }
+.chip.on { border-color:var(--gold); color:var(--gold); background:linear-gradient(160deg,rgba(201,168,76,.09),rgba(201,168,76,.03)); }
+
+.r-field {
+  flex:1; min-height:180px;
+  background:var(--bg2);
+  border:1.5px solid var(--border); border-radius:16px;
+  padding:16px; color:var(--cream);
+  font-size:14px; line-height:1.75; font-family:'Inter',sans-serif;
+  resize:none; outline:none; transition:border-color .2s, box-shadow .2s;
+  margin-bottom:10px;
+}
+.r-field:focus { border-color:rgba(194,106,58,.35); box-shadow:0 0 0 3px rgba(194,106,58,.07); }
+.r-field::placeholder { color:rgba(138,114,96,.40); }
+.char-c { font-size:11px; color:var(--muted); text-align:right; margin-bottom:16px; opacity:.55; }
+
+/* ══════════════════════════════════════════
+   S-LOAD
+══════════════════════════════════════════ */
+#s-load {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.load-t {
+  font-family:'Lora',serif;
+  font-size:20px; line-height:1.55; letter-spacing:-.01em;
+  color:var(--cream); text-align:center; margin-bottom:28px;
+  font-style:italic;
+}
+.dots { display:flex; gap:10px; }
+.dot {
+  width:7px; height:7px; border-radius:50%; background:var(--gold);
+  animation:blink 1.3s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay:.22s; }
+.dot:nth-child(3) { animation-delay:.44s; }
+@keyframes blink {
+  0%,80%,100% { opacity:.12; transform:scale(.7); }
+  40%         { opacity:1;   transform:scale(1); }
+}
+
+/* ══════════════════════════════════════════
+   S3 — RESPOSTA DA IA
+══════════════════════════════════════════ */
+#s3 { padding:72px 32px 46px; display:flex; flex-direction:column; }
+
+.resp-hdr { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.resp-av {
+  width:44px; height:44px;
+  background:linear-gradient(135deg,rgba(194,106,58,.18),rgba(194,106,58,.04));
+  border-radius:13px; border:1px solid rgba(194,106,58,.20);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.resp-nm { font-size:9px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); opacity:.75; margin-bottom:3px; }
+.resp-sub { font-size:12px; color:var(--muted); }
+
+/* Echo quote */
+.echo {
+  background:var(--bg2);
+  border-left:2px solid var(--gold); border-radius:0 12px 12px 0;
+  padding:13px 15px; margin-bottom:22px;
+  font-size:13px; font-style:italic; color:var(--muted); line-height:1.65;
+  box-shadow:0 2px 10px rgba(30,58,47,.05);
+}
+
+.resp-body {
+  font-family:'Lora',serif;
+  font-size:16px; line-height:1.8; letter-spacing:-.005em;
+  color:var(--cream); margin-bottom:26px; font-style:italic;
+}
+
+.insight {
+  background:linear-gradient(160deg,rgba(201,168,76,.07),rgba(201,168,76,.02));
+  border:1px solid rgba(201,168,76,.16); border-radius:14px;
+  padding:16px; margin-bottom:26px;
+}
+.ins-lbl { font-size:9px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); opacity:.7; margin-bottom:8px; }
+.ins-txt { font-size:13px; color:var(--cream); line-height:1.65; }
+
+.share-row { display:flex; align-items:center; gap:11px; margin-bottom:26px; }
+.toggle {
+  width:44px; height:26px;
+  background:rgba(30,58,47,.08); border:1px solid rgba(30,58,47,.14);
+  border-radius:13px; cursor:pointer; position:relative; transition:background .25s;
+  flex-shrink:0;
+}
+.toggle.on { background:linear-gradient(135deg,#C26A3A,#9E5228); border-color:transparent; box-shadow:0 2px 10px rgba(194,106,58,.28); }
+.t-dot {
+  position:absolute; top:3px; left:3px;
+  width:20px; height:20px; background:#FFFFFF;
+  border-radius:50%; transition:transform .25s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 1px 4px rgba(30,58,47,.18);
+}
+.toggle.on .t-dot { transform:translateX(18px); }
+.share-lbl { font-size:13px; color:var(--muted); line-height:1.5; }
+
+/* ══════════════════════════════════════════
+   S4 — PRÓXIMO LIVRO
+══════════════════════════════════════════ */
+#s4 {
+  display:flex; flex-direction:column; align-items:center;
+  padding:72px 32px 46px; text-align:center;
+}
+
+.next-eyebrow {
+  font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); opacity:.75; margin-bottom:22px;
+}
+
+/* 3-D book */
+.book-wrap { display:flex; justify-content:center; margin-bottom:22px; perspective:600px; }
+.book-3d {
+  width:106px; height:152px;
+  border-radius:3px 8px 8px 3px;
+  position:relative;
+  transform:rotateY(-14deg);
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+  filter:
+    drop-shadow(-6px 8px 22px rgba(0,0,0,.75))
+    drop-shadow(-2px 2px 6px rgba(0,0,0,.5));
+}
+.book-3d:hover { transform:rotateY(-6deg); }
+.b-spine {
+  position:absolute; left:0; top:0; bottom:0;
+  width:8px; background:rgba(0,0,0,.45);
+  border-radius:3px 0 0 3px;
+}
+.b-face {
+  position:absolute; inset:0;
+  border-radius:3px 8px 8px 3px;
+  display:flex; align-items:flex-end; padding:10px; overflow:hidden;
+}
+.b-face::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to right, rgba(0,0,0,.3) 0%, transparent 20%);
+}
+.b-title {
+  font-family:'Lora',serif;
+  font-size:11px; color:rgba(255,255,255,.85);
+  line-height:1.4; position:relative; z-index:1;
+}
+
+.next-title {
+  font-family:'Lora',serif;
+  font-size:21px; letter-spacing:-.015em;
+  color:var(--cream); margin-bottom:4px;
+}
+.next-author { font-size:12px; color:var(--gold); letter-spacing:.05em; margin-bottom:14px; }
+
+.evol-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.2);
+  border-radius:20px; padding:5px 13px;
+  font-size:11px; color:var(--gold); margin-bottom:16px;
+}
+
+.why-rule { width:28px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:0 auto 14px; opacity:.4; }
+.next-why { font-size:13.5px; color:var(--muted); line-height:1.75; margin-bottom:22px; padding:0 4px; }
+
+.group-card {
+  background:var(--bg2);
+  border:1px solid var(--bord-g); border-radius:14px;
+  padding:13px 16px; display:flex; align-items:center; gap:12px;
+  margin-bottom:26px; width:100%; text-align:left;
+  box-shadow:0 2px 10px rgba(30,58,47,.05);
+}
+.g-icon {
+  width:36px; height:36px; background:rgba(194,106,58,.10);
+  border-radius:10px; display:flex; align-items:center;
+  justify-content:center; font-size:16px; flex-shrink:0;
+}
+.g-name { font-size:14px; font-weight:600; color:var(--cream); }
+.g-desc { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* Responsive */
+@media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
+@media (max-height:800px) { .phone { transform:scale(.83); } }
+@media (max-width:420px)  { .phone { width:100vw; height:100vh; border-radius:0; transform:none !important; } }
+</style>
+<link rel="stylesheet" href="assets/theme.css">
+<script src="assets/book-context.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script src="assets/travez.js" defer></script>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ══ S1: CONQUISTA ══════════════════════════ -->
+  <div class="screen active" id="s1">
+    <div class="glow-outer"></div>
+    <div class="glow-inner"></div>
+
+    <div class="badge-icon">✦</div>
+
+    <div class="victory-book" id="completed-cover" style="background:linear-gradient(135deg,#2C4A3E,#1A3028)">
+      <div class="vb-spine"></div>
+      <p class="vb-title" id="completed-cover-title">A<br>Metamorfose</p>
+    </div>
+
+    <p class="c-lbl">Jornada concluída</p>
+    <h1 class="c-title">Você terminou<br>o livro.</h1>
+    <p class="c-book" id="completed-book-line">A Metamorfose · Franz Kafka</p>
+
+    <div class="stats-strip">
+      <div class="stat-cell"><p class="sv" id="stat-days">12</p><p class="ss">dias</p></div>
+      <div class="stat-cell"><p class="sv" id="stat-pages">178</p><p class="ss">páginas</p></div>
+      <div class="stat-cell"><p class="sv" id="stat-time">~4h</p><p class="ss">investidas</p></div>
+    </div>
+
+    <p class="c-sub">"Antes de partir para uma próxima experiência literária, vamos aprofundar o que essa obra moveu em você."</p>
+
+    <button class="btn" onclick="startDeepening()">Aprofundar minha leitura</button>
+  </div>
+
+  <!-- ══ S2: APROFUNDAMENTO GUIADO ══════════════ -->
+  <div class="screen" id="s-deep">
+    <button class="back" onclick="go('s1')">← Voltar</button>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Antes da sua reflexão, vamos abrir camadas da obra.</p>
+    <p class="deep-intro">Use este mapa como apoio. Ele não substitui sua leitura: apenas ilumina caminhos para você perceber o que ficou vivo.</p>
+
+    <div class="deep-list" id="deep-list"></div>
+
+    <div class="next-step">
+      <p class="next-step-title">Escolha sua próxima etapa</p>
+      <div class="path-list">
+        <div class="path-card">
+          <p class="path-kicker">Opção 1 — Reflexão</p>
+          <p class="path-desc">Compartilhe com outros leitores o que essa leitura provocou em você.</p>
+          <button class="path-btn" type="button">Escrever minha reflexão</button>
+        </div>
+        <div class="path-card">
+          <p class="path-kicker">Opção 2 — IA Travez</p>
+          <p class="path-desc">Receba uma sugestão de nova experiência literária inspirada no que você acabou de viver nesta obra.</p>
+          <button class="path-btn" type="button" onclick="startTravezSuggestion()">Quero dicas de leitura da IA Travez</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ S3: REFLEXÃO ═══════════════════════════ -->
+  <div class="screen" id="s2">
+    <button class="back" onclick="go('s-deep')">← Voltar</button>
+    <div style="padding:72px 32px 44px; display:flex; flex-direction:column; height:100%;">
+      <p class="ai-lbl">IA Travez</p>
+      <p class="ai-msg">O que ficou desta leitura para você?</p>
+      <div class="chips">
+        <span class="chip" onclick="addChip(this,'O que mudou na forma como vejo ')">O que mudou</span>
+        <span class="chip" onclick="addChip(this,'O que mais me surpreendeu foi ')">O que surpreendeu</span>
+        <span class="chip" onclick="addChip(this,'Quero aplicar ')">Quero aplicar</span>
+      </div>
+      <textarea class="r-field" id="reflection" data-default-reflection="true" oninput="onType()"
+        placeholder="Escreva livremente. Não existe resposta certa.">Esse livro mudou como vejo pertencimento e utilidade. Percebi como Gregor vai deixando de ser tratado como pessoa quando não consegue mais cumprir seu papel. Quero aplicar isso na forma como olho para minhas relações e cobranças.</textarea>
+      <p class="char-c" id="char-c">201 caracteres</p>
+      <div style="flex:1;min-height:8px"></div>
+      <button class="btn" onclick="startLoad()">Enviar para a IA</button>
+    </div>
+  </div>
+
+  <!-- ══ S-LOAD ══════════════════════════════════ -->
+  <div class="screen" id="s-load">
+    <p class="load-t">Lendo<br>sua reflexão…</p>
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+
+  <!-- ══ S3: RESPOSTA DA IA ══════════════════════ -->
+  <div class="screen" id="s3">
+    <div style="padding:72px 32px 46px; display:flex; flex-direction:column; min-height:100%;">
+      <button class="back" style="position:static;margin-bottom:20px" onclick="go('s2')">← Editar reflexão</button>
+      <div class="resp-hdr">
+        <div class="resp-av">📖</div>
+        <div><p class="resp-nm">IA Travez</p><p class="resp-sub">Leu sua reflexão</p></div>
+      </div>
+      <div class="echo" id="echo">"Sempre joguei para ganhar quando devia estar jogando para continuar…"</div>
+      <p class="resp-body">Você não só leu — você jogou de volta. Conectar o livro com suas negociações exige uma leitura ativa que poucos fazem.</p>
+      <div class="insight">
+        <p class="ins-lbl">O que isso diz sobre você</p>
+        <p class="ins-txt">Você chegou aqui em Modo Expansão. Saiu com uma nova lente. A próxima intervenção começa de um lugar diferente — mais alto.</p>
+      </div>
+      <div class="share-row">
+        <div class="toggle on" id="tog" onclick="togShare()"><div class="t-dot"></div></div>
+        <p class="share-lbl">Compartilhar reflexão com o Grupo Alavanca</p>
+      </div>
+      <div style="flex:1;min-height:8px"></div>
+      <button class="btn" onclick="go('s4')">Ver próximo livro</button>
+    </div>
+  </div>
+
+  <!-- ══ S4: PRÓXIMO LIVRO ══════════════════════ -->
+  <div class="screen" id="s4">
+    <p class="next-eyebrow">Sua próxima intervenção</p>
+    <div class="book-wrap">
+      <div class="book-3d">
+        <div class="b-spine"></div>
+        <div class="b-face" style="background:linear-gradient(135deg,#5C1A1A,#3A0A0A)">
+          <p class="b-title">O Ego<br>é Seu<br>Inimigo</p>
+        </div>
+      </div>
+    </div>
+    <h2 class="next-title">O Ego é Seu Inimigo</h2>
+    <p class="next-author">Ryan Holiday</p>
+    <div class="evol-badge">↑ evolução do seu perfil</div>
+    <div class="why-rule"></div>
+    <p class="next-why">Você saiu dos Jogos com uma nova estratégia de longo prazo. Ryan Holiday vai te mostrar o que pode sabotá-la — por dentro.</p>
+    <div class="group-card">
+      <div class="g-icon">⚡</div>
+      <div><p class="g-name">Grupo Alavanca</p><p class="g-desc">Continua com o mesmo grupo · 30 min+/dia</p></div>
+    </div>
+    <button class="btn" style="width:100%;margin-bottom:10px" onclick="window.location.href='home.html'">Aceitar esta leitura</button>
+    <button class="btn-ghost" style="width:100%">Ver outras opções</button>
+  </div>
+
+</div>
+<script>
+let completedBook = window.MentorBookContext?.fallback || {
+  title:'A Metamorfose',
+  author:'Franz Kafka',
+  totalPages:178,
+  readingDays:12,
+  investedTime:'~4h',
+  coverTitle:'A\nMetamorfose',
+  coverColor:'linear-gradient(135deg,#2C4A3E,#1A3028)'
+};
+
+function coverHtml(title) {
+  return String(title || '').replace(/\n/g,'<br>');
+}
+
+function applyCompletedBook() {
+  completedBook = window.MentorBookContext?.read() || completedBook;
+  document.getElementById('completed-cover').style.background=completedBook.coverColor;
+  document.getElementById('completed-cover-title').innerHTML=coverHtml(completedBook.coverTitle || completedBook.title);
+  document.getElementById('completed-book-line').textContent=`${completedBook.title} · ${completedBook.author}`;
+  document.getElementById('stat-days').textContent=completedBook.readingDays || 12;
+  document.getElementById('stat-pages').textContent=completedBook.totalPages || completedBook.currentPage || 178;
+  document.getElementById('stat-time').textContent=completedBook.investedTime || '~4h';
+
+  const reflection=document.getElementById('reflection');
+  if(reflection?.dataset.defaultReflection==='true') {
+    reflection.value=`Esse livro, ${completedBook.title}, mudou como vejo as camadas entre história e vida. Quero registrar o que essa leitura provocou em mim antes de seguir para a próxima experiência literária.`;
+    onType();
+  }
+}
+
+function deepeningMock() {
+  return [
+    {
+      title:'Ideias centrais da obra',
+      items:[
+        `${completedBook.title} organiza uma experiência de leitura em torno das tensões que atravessam a trajetória proposta por ${completedBook.author}.`,
+        'A obra funciona como uma lente para observar escolhas, deslocamentos internos e aquilo que permanece depois da última página.'
+      ]
+    },
+    {
+      title:'O que está nas entrelinhas',
+      items:[
+        'O que mais importa talvez não esteja apenas no enredo, mas na forma como a leitura reposiciona o olhar do leitor.',
+        'As entrelinhas convidam a perceber que toda obra também revela algo sobre o momento de vida de quem a encontra.'
+      ]
+    },
+    {
+      title:'Contexto de fundo da obra',
+      items:[
+        `${completedBook.author} conduz uma experiência literária que pode ser lida a partir de seu tempo, de suas inquietações e da forma como escolhe dar corpo ao conflito humano.`,
+        'A leitura ganha profundidade quando o livro deixa de ser apenas história e passa a conversar com repertório, memória e circunstância.'
+      ]
+    },
+    {
+      title:'Perguntas para reflexão',
+      items:[
+        `O que ${completedBook.title} fez você perceber que talvez já estivesse em movimento dentro de você?`,
+        'Que imagem, cena ou ideia continuou ecoando depois da leitura?'
+      ]
+    },
+    {
+      title:'Conexões com a vida prática',
+      items:[
+        'A obra pode ser levada para a vida como uma pergunta sobre atenção: o que você passa a notar depois dela?',
+        'A próxima escolha literária pode partir justamente do incômodo, da beleza ou da dúvida que esta leitura deixou.'
+      ]
+    }
+  ];
+}
+
+async function getDeepening() {
+  // Futuro ponto de integração: trocar este mock por uma chamada real ao backend.
+  // Exemplo: const r = await fetch('/api/deepening', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ book:'A Metamorfose', author:'Franz Kafka' }) });
+  // return await r.json();
+  return new Promise(resolve => setTimeout(() => resolve(deepeningMock()), 450));
+}
+
+function renderDeepening(sections) {
+  const list=document.getElementById('deep-list');
+  list.innerHTML='';
+  sections.forEach(section=>{
+    const card=document.createElement('div');
+    card.className='deep-card';
+
+    const title=document.createElement('p');
+    title.className='deep-title';
+    title.textContent=section.title;
+
+    const body=document.createElement('div');
+    body.className='deep-text';
+    const ul=document.createElement('ul');
+    section.items.forEach(item=>{
+      const li=document.createElement('li');
+      li.textContent=item;
+      ul.appendChild(li);
+    });
+    body.appendChild(ul);
+
+    card.appendChild(title);
+    card.appendChild(body);
+    list.appendChild(card);
+  });
+}
+
+async function startDeepening() {
+  go('s-deep');
+  renderDeepening(await getDeepening());
+}
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function startLoad() {
+  const txt=document.getElementById('reflection').value;
+  const s=txt.split(/[.!?]/);
+  document.getElementById('echo').textContent='"'+(s[0]?s[0].trim():txt.slice(0,80))+'…"';
+  go('s-load');
+  setTimeout(()=>go('s3'),2200);
+}
+function onType() {
+  const v=document.getElementById('reflection').value;
+  document.getElementById('char-c').textContent=v.length+' caracteres';
+}
+function addChip(chip,txt) {
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  chip.classList.add('on');
+  const f=document.getElementById('reflection');
+  if(!f.value.trim()) f.value=txt; else f.value=f.value+' '+txt;
+  f.focus(); onType();
+}
+let shareOn=true;
+function togShare() {
+  shareOn=!shareOn;
+  document.getElementById('tog').classList.toggle('on',shareOn);
+}
+window.addEventListener('load',()=>{
+  applyCompletedBook();
+  const v=document.getElementById('reflection').value;
+  document.getElementById('char-c').textContent=v.length+' caracteres';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor de Evolução</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --paper:   #F6F0E8;
+  --paper2:  #EDE6DA;
+  --paper3:  #E2D9CC;
+  --ink:     #1C1610;
+  --ink2:    #48392A;
+  --ink3:    #8C7B68;
+  --crim:    #BF4B1C;
+  --crim-lt: #D96A3A;
+  --c-dim:   rgba(191,75,28,.09);
+  --c-bord:  rgba(191,75,28,.22);
+  --border:  rgba(28,22,16,.09);
+}
+
+html { -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+
+body {
+  background: radial-gradient(ellipse 80% 70% at 25% 15%, #EDD8C0 0%, #D4BFA0 55%, #C6AB8A 100%);
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh;
+  font-family:'DM Sans',sans-serif;
+}
+
+/* ── Phone ─────────────────────────────────── */
+.phone {
+  width:390px; height:844px;
+  background: var(--paper);
+  border-radius:52px; overflow:hidden;
+  position:relative;
+  box-shadow:
+    0 0 0 1px rgba(28,22,16,.10),
+    0 40px 90px rgba(28,22,16,.28),
+    0 8px 24px rgba(28,22,16,.12),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+.phone::before {
+  content:'';
+  position:absolute; top:14px; left:50%;
+  transform:translateX(-50%);
+  width:118px; height:34px;
+  background:#1C1610; border-radius:20px; z-index:100;
+}
+/* Paper grain overlay */
+.phone::after {
+  content:'';
+  position:absolute; inset:0; z-index:9998; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+  opacity:.038;
+  mix-blend-mode:multiply;
+  border-radius:52px;
+}
+
+/* ── Screens ────────────────────────────────── */
+.screen {
+  position:absolute; inset:0;
+  opacity:0; transform:translateX(20px) scale(0.99);
+  pointer-events:none;
+  transition:opacity .4s cubic-bezier(.4,0,.2,1), transform .4s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto; scrollbar-width:none;
+}
+.screen::-webkit-scrollbar { display:none; }
+.screen.active { opacity:1; transform:translateX(0) scale(1); pointer-events:all; }
+
+/* ── Progress ───────────────────────────────── */
+.progress { display:flex; gap:4px; margin-bottom:38px; }
+.p-dot {
+  height:1.5px; flex:1; border-radius:2px;
+  background:rgba(28,22,16,.12);
+  transition:background .4s;
+}
+.p-dot.on { background:var(--crim); }
+
+/* ── Back ───────────────────────────────────── */
+.back {
+  display:inline-flex; align-items:center; gap:5px;
+  color:var(--ink3); font-size:13px; cursor:pointer;
+  margin-bottom:28px; background:none; border:none;
+  font-family:'DM Sans',sans-serif; transition:color .2s;
+}
+.back:hover { color:var(--ink2); }
+
+/* ── AI label + message ─────────────────────── */
+.ai-lbl {
+  font-size:9px; font-weight:500;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--crim); margin-bottom:12px;
+}
+.ai-msg {
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px; font-style:italic; font-weight:400;
+  line-height:1.42; letter-spacing:-.01em;
+  color:var(--ink); margin-bottom:30px;
+}
+
+/* ── Cards ──────────────────────────────────── */
+.card {
+  background:rgba(255,255,255,.6);
+  border:1.5px solid var(--border);
+  border-radius:16px; padding:18px 20px;
+  margin-bottom:10px; cursor:pointer;
+  box-shadow:0 1px 8px rgba(28,22,16,.05);
+  transition:border-color .2s, background .2s, transform .15s, box-shadow .2s;
+  user-select:none;
+}
+.card:hover {
+  border-color:var(--c-bord);
+  background:rgba(255,255,255,.85);
+  box-shadow:0 3px 18px rgba(28,22,16,.08);
+}
+.card:active { transform:scale(.985); }
+.card.sel {
+  border-color:var(--crim);
+  background:rgba(191,75,28,.04);
+  box-shadow:0 0 0 1px rgba(191,75,28,.10), 0 3px 16px rgba(28,22,16,.07);
+}
+.card-hdr { display:flex; justify-content:space-between; align-items:flex-start; }
+.card-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:16px; font-weight:500; color:var(--ink); margin-bottom:5px;
+  letter-spacing:-.01em;
+}
+.card-desc { font-size:12.5px; color:var(--ink3); line-height:1.65; }
+.chk {
+  width:18px; height:18px; border-radius:50%;
+  border:1.5px solid rgba(28,22,16,.18);
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; flex-shrink:0;
+}
+.card.sel .chk { background:var(--crim); border-color:var(--crim); }
+.card.sel .chk::after { content:'✓'; font-size:9px; font-weight:700; color:#FFF; }
+
+/* ── Input ──────────────────────────────────── */
+.field {
+  background:rgba(255,255,255,.7);
+  border:1.5px solid var(--border); border-radius:13px;
+  padding:15px 16px; color:var(--ink);
+  font-size:15px; font-family:'DM Sans',sans-serif;
+  width:100%; outline:none;
+  transition:border-color .2s, box-shadow .2s;
+}
+.field:focus { border-color:var(--crim); box-shadow:0 0 0 3px rgba(191,75,28,.07); }
+.field::placeholder { color:rgba(140,123,104,.4); }
+
+/* ── Energy ─────────────────────────────────── */
+.energy-wrap { max-height:0; overflow:hidden; transition:max-height .45s cubic-bezier(.4,0,.2,1); }
+.energy-wrap.open { max-height:130px; }
+.e-lbl { font-size:12.5px; color:var(--ink3); margin:20px 0 12px; }
+.e-btns { display:flex; gap:8px; }
+.e-btn {
+  flex:1; padding:11px 0;
+  background:rgba(255,255,255,.6);
+  border:1.5px solid var(--border); border-radius:11px;
+  color:var(--ink3); font-size:13px;
+  font-family:'DM Sans',sans-serif; cursor:pointer;
+  transition:all .2s;
+}
+.e-btn:hover { border-color:var(--c-bord); color:var(--ink2); }
+.e-btn.sel {
+  background:rgba(191,75,28,.06);
+  border-color:var(--crim); color:var(--crim);
+}
+
+/* ── Button ─────────────────────────────────── */
+.btn {
+  width:100%; padding:16px;
+  background:var(--crim);
+  border:none; border-radius:14px;
+  color:#FFF; font-size:14.5px; font-weight:500;
+  font-family:'DM Sans',sans-serif; cursor:pointer;
+  transition:background .2s, transform .15s, box-shadow .2s, opacity .2s;
+  margin-top:auto; flex-shrink:0;
+  box-shadow:0 4px 18px rgba(191,75,28,.28);
+  letter-spacing:.01em;
+  position:relative; overflow:hidden;
+}
+.btn::before {
+  content:''; position:absolute; inset:0;
+  background:rgba(255,255,255,.10);
+  transform:translateX(-110%);
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.btn:hover:not(:disabled)::before { transform:translateX(0); }
+.btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 24px rgba(191,75,28,.34); }
+.btn:active:not(:disabled) { transform:scale(.98); }
+.btn:disabled { opacity:.25; cursor:not-allowed; }
+
+.btn-ghost {
+  width:100%; padding:13px;
+  background:none; border:none;
+  color:var(--ink3); font-size:13.5px;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer; text-align:center;
+  margin-top:10px; transition:color .2s; flex-shrink:0;
+}
+.btn-ghost:hover { color:var(--ink2); }
+
+/* ── Welcome ────────────────────────────────── */
+#s1 { padding:72px 34px 48px; display:flex; flex-direction:column; }
+
+.logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:11.5px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--crim); font-weight:500;
+  animation: fadeUp .5s ease both;
+}
+.w-body { flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom:12px; }
+.w-eyebrow {
+  font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--ink3); margin-bottom:20px;
+  animation: fadeUp .5s ease both .1s;
+}
+.w-rule {
+  width:36px; height:1px;
+  background: linear-gradient(90deg, var(--crim), transparent);
+  margin-bottom:22px; opacity:.7;
+  animation: fadeUp .4s ease both .14s;
+}
+.w-h {
+  font-family:'Cormorant Garamond',serif;
+  font-size:50px; line-height:1.10; letter-spacing:-.025em;
+  color:var(--ink); margin-bottom:20px;
+  font-weight:300; font-style:italic;
+  animation: fadeUp .7s ease both .2s;
+}
+.w-sub {
+  font-size:14px; line-height:1.82;
+  color:var(--ink2); margin-bottom:42px;
+  font-weight:300;
+  animation: fadeUp .5s ease both .44s;
+}
+.btn-wrap { animation: fadeUp .5s ease both .58s; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Steps ──────────────────────────────────── */
+.step-screen { padding:68px 34px 44px; display:flex; flex-direction:column; }
+
+/* ── Loading ────────────────────────────────── */
+#s-load {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background: var(--paper);
+}
+.load-t {
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px; font-style:italic; font-weight:400;
+  line-height:1.55; letter-spacing:-.01em;
+  color:var(--ink2); text-align:center; margin-bottom:32px;
+}
+.dots { display:flex; gap:10px; }
+.dot {
+  width:6px; height:6px; border-radius:50%; background:var(--crim);
+  animation:blink 1.4s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay:.24s; }
+.dot:nth-child(3) { animation-delay:.48s; }
+@keyframes blink {
+  0%,80%,100% { opacity:.14; transform:scale(.65); }
+  40%         { opacity:1;   transform:scale(1);  }
+}
+
+/* ── Delivery ───────────────────────────────── */
+#s6 { padding:54px 34px 46px; display:flex; flex-direction:column; }
+.d-scroll { flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:16px; }
+.d-scroll::-webkit-scrollbar { display:none; }
+.d-eyebrow {
+  font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--crim); text-align:center; margin-bottom:24px; font-weight:500;
+}
+
+/* Book cover 3-D */
+.book-wrap { display:flex; justify-content:center; margin-bottom:26px; perspective:600px; }
+.book-3d {
+  width:108px; height:154px;
+  border-radius:3px 8px 8px 3px;
+  position:relative;
+  transform:rotateY(-14deg);
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+  filter:
+    drop-shadow(-8px 10px 28px rgba(28,22,16,.32))
+    drop-shadow(-2px 2px 6px rgba(28,22,16,.18));
+}
+.book-3d:hover { transform:rotateY(-5deg); }
+.book-face {
+  position:absolute; inset:0;
+  border-radius:3px 8px 8px 3px;
+  display:flex; align-items:flex-end; padding:10px; overflow:hidden;
+}
+.book-face::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to right, rgba(0,0,0,.38) 0%, transparent 20%);
+}
+.book-spine {
+  position:absolute; left:0; top:0; bottom:0;
+  width:8px; background:rgba(0,0,0,.48);
+  border-radius:3px 0 0 3px;
+}
+.book-face-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:11px; font-style:italic;
+  color:rgba(255,255,255,.88); line-height:1.4;
+  position:relative; z-index:1;
+}
+
+.d-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px; letter-spacing:-.02em; font-weight:500;
+  color:var(--ink); text-align:center; margin-bottom:3px;
+}
+.d-author {
+  font-size:11.5px; color:var(--crim); text-align:center;
+  letter-spacing:.08em; text-transform:uppercase;
+  font-weight:500; margin-bottom:18px;
+}
+.d-rule {
+  width:24px; height:1px;
+  background:linear-gradient(90deg,transparent,var(--crim),transparent);
+  margin:0 auto 16px;
+}
+.d-why {
+  font-family:'Cormorant Garamond',serif;
+  font-size:16px; font-style:italic; font-weight:400;
+  color:var(--ink2); line-height:1.75;
+  text-align:center; margin-bottom:24px; padding:0 4px;
+}
+.group-card {
+  background:rgba(255,255,255,.65);
+  border:1px solid var(--c-bord);
+  border-radius:14px; padding:13px 16px;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:6px;
+}
+.g-icon {
+  width:36px; height:36px;
+  background:var(--c-dim); border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.g-name { font-size:14px; font-weight:500; color:var(--ink); }
+.g-desc { font-size:12px; color:var(--ink3); margin-top:2px; }
+
+@media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
+@media (max-height:800px) { .phone { transform:scale(.83); } }
+@media (max-width:420px)  { .phone { width:100vw; height:100vh; border-radius:0; transform:none !important; } }
+</style>
+<link rel="stylesheet" href="assets/theme.css">
+<script src="assets/theme.js" defer></script>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ═══ S1: WELCOME ══════════════════════════ -->
+  <div class="screen active" id="s1">
+    <p class="logo">Mentor de Evolução</p>
+    <div class="w-body">
+      <p class="w-eyebrow">Ecossistema de Inteligência Literária</p>
+      <div class="w-rule"></div>
+      <h1 class="w-h">Você lê.<br>Mas o quanto<br>realmente fica?</h1>
+      <p class="w-sub">Cada livro é escolhido pelo que você precisa agora — não pelo que o algoritmo acha que você quer.</p>
+    </div>
+    <div class="btn-wrap">
+      <button class="btn" onclick="go('s2')">Começar minha jornada</button>
+      <button class="btn-ghost">Já tenho conta</button>
+    </div>
+  </div>
+
+  <!-- ═══ S2: HISTÓRICO ════════════════════════ -->
+  <div class="screen step-screen" id="s2">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot"></div>
+      <div class="p-dot"></div><div class="p-dot"></div>
+    </div>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Qual foi o último livro que você leu?</p>
+    <input class="field" type="text" id="book-field"
+      placeholder="Ex: Atomic Habits, O Alquimista…"
+      oninput="onBook(this.value)" />
+    <div class="energy-wrap" id="energy-wrap">
+      <p class="e-lbl">De 0 a 10, o quanto essa leitura te deu energia?</p>
+      <div class="e-btns">
+        <button class="e-btn" onclick="selE(0,this)">😴 0–3</button>
+        <button class="e-btn" onclick="selE(1,this)">😐 4–6</button>
+        <button class="e-btn" onclick="selE(2,this)">✨ 7–10</button>
+      </div>
+    </div>
+    <div style="flex:1;min-height:20px"></div>
+    <button class="btn" id="btn1" disabled onclick="go('s3')">Continuar</button>
+  </div>
+
+  <!-- ═══ S3: AFINIDADE ════════════════════════ -->
+  <div class="screen step-screen" id="s3">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+      <div class="p-dot"></div><div class="p-dot"></div>
+    </div>
+    <button class="back" onclick="go('s2')">← Voltar</button>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Em uma livraria com 3 estantes, para qual seus pés te levariam?</p>
+    <div class="card" id="a0" onclick="selCard('affinity',0,3)">
+      <div class="card-hdr"><p class="card-title">Vida Real</p><span class="chk"></span></div>
+      <p class="card-desc">Histórias de pessoas, biografias e dramas humanos</p>
+    </div>
+    <div class="card" id="a1" onclick="selCard('affinity',1,3)">
+      <div class="card-hdr"><p class="card-title">Futuro &amp; Estratégia</p><span class="chk"></span></div>
+      <p class="card-desc">Negócios, tecnologia, tendências e novos modelos de pensamento</p>
+    </div>
+    <div class="card" id="a2" onclick="selCard('affinity',2,3)">
+      <div class="card-hdr"><p class="card-title">Profundidade</p><span class="chk"></span></div>
+      <p class="card-desc">Filosofia, psicologia e clássicos que questionam a existência</p>
+    </div>
+    <div style="flex:1;min-height:12px"></div>
+    <button class="btn" id="btn2" disabled onclick="go('s4')">Continuar</button>
+  </div>
+
+  <!-- ═══ S4: ESTADO DE ESPÍRITO ═══════════════ -->
+  <div class="screen step-screen" id="s4">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+      <div class="p-dot on"></div><div class="p-dot"></div>
+    </div>
+    <button class="back" onclick="go('s3')">← Voltar</button>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Como está sua disponibilidade mental esta semana?</p>
+    <div class="card" id="m0" onclick="selCard('mood',0,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">Modo Bateria Fraca</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Quero algo profundo, mas fácil de digerir. Preciso de um respiro.</p>
+    </div>
+    <div class="card" id="m1" onclick="selCard('mood',1,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">Modo Expansão</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Quero ser desafiada. Pode me dar algo denso que mude minha visão de mundo.</p>
+    </div>
+    <div style="flex:1;min-height:12px"></div>
+    <button class="btn" id="btn3" disabled onclick="go('s5')">Continuar</button>
+  </div>
+
+  <!-- ═══ S5: VELOCIDADE ════════════════════════ -->
+  <div class="screen step-screen" id="s5">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+    </div>
+    <button class="back" onclick="go('s4')">← Voltar</button>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Última pergunta — quanto tempo por dia?</p>
+    <div class="card" id="v0" onclick="selCard('speed',0,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">15 min · Pílulas de Sabedoria</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Ideal para quem tem rotina intensa</p>
+    </div>
+    <div class="card" id="v1" onclick="selCard('speed',1,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">30 min+ · Mergulho Profundo</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Para quem quer priorizar a leitura agora</p>
+    </div>
+    <div style="flex:1;min-height:12px"></div>
+    <button class="btn" id="btn4" disabled onclick="startLoad()">Ver minha recomendação</button>
+  </div>
+
+  <!-- ═══ LOADING ═══════════════════════════════ -->
+  <div class="screen" id="s-load">
+    <p class="load-t">Analisando<br>seu perfil…</p>
+    <div class="dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- ═══ S6: ENTREGA ═══════════════════════════ -->
+  <div class="screen" id="s6">
+    <div class="d-scroll">
+      <p class="d-eyebrow">Sua intervenção literária</p>
+      <div class="book-wrap">
+        <div class="book-3d" id="book3d">
+          <div class="book-spine"></div>
+          <div class="book-face" id="book-face" style="background:linear-gradient(135deg,#2C4A3E,#1A3028)">
+            <p class="book-face-title" id="cover-txt">A<br>Metamorfose</p>
+          </div>
+        </div>
+      </div>
+      <h2 class="d-title" id="d-title">A Metamorfose</h2>
+      <p class="d-author" id="d-author">Franz Kafka</p>
+      <div class="d-rule"></div>
+      <p class="d-why" id="d-why">Modo Expansão + Estratégia. Este livro vai te dar o choque de realidade que você busca — uma nova forma de enxergar cada decisão que você toma.</p>
+      <div class="group-card">
+        <div class="g-icon" id="d-icon">⚡</div>
+        <div>
+          <p class="g-name" id="d-group">Grupo Alavanca</p>
+          <p class="g-desc"  id="d-desc">30 min+/dia · Aplicação prática e visão</p>
+        </div>
+      </div>
+    </div>
+    <button class="btn" style="margin-top:16px;flex-shrink:0"
+      onclick="window.location.href='home-light.html'">Vamos nessa →</button>
+  </div>
+
+</div>
+<script>
+const state = { affinity:-1, mood:-1, speed:-1, energy:-1 };
+const books = {
+  '0-0':{ title:'Stoner', author:'John Williams', coverTxt:'Stoner', bg:'linear-gradient(135deg,#4A2C1A,#2A1508)', why:'Bateria Fraca + Vida Real. Um mergulho silencioso na humanidade — profundo sem pesar, o respiro que você precisa.', group:'Grupo Pausa', desc:'15 min/dia · Empatia e ritmo lento', icon:'🌿' },
+  '0-1':{ title:'O Poder do Hábito', author:'Charles Duhigg', coverTxt:'O Poder\ndo Hábito', bg:'linear-gradient(135deg,#4A3A1A,#2A200A)', why:'Expansão + Vida Real. Como os padrões que você vive foram construídos — e como mudá-los com precisão.', group:'Grupo Alavanca', desc:'30 min+/dia · Aplicação prática e visão', icon:'⚡' },
+  '1-0':{ title:'Klara e o Sol', author:'Kazuo Ishiguro', coverTxt:'Klara\ne o Sol', bg:'linear-gradient(135deg,#1A3A4A,#0A2030)', why:'Bateria Fraca + Estratégia. Perspectiva sobre tecnologia e humanidade com leveza — densidade sem peso.', group:'Grupo Pausa', desc:'15 min/dia · Empatia e ritmo lento', icon:'🌿' },
+  '1-1':{ title:'A Metamorfose', author:'Franz Kafka', coverTxt:'A\nMetamorfose', bg:'linear-gradient(135deg,#2C4A3E,#1A3028)', why:'Expansão + Estratégia. Uma leitura curta e perturbadora sobre identidade, utilidade e pertencimento — para rever como você habita trabalho e vida.', group:'Grupo Alavanca', desc:'30 min+/dia · Aplicação prática e visão', icon:'⚡' },
+  '2-0':{ title:'Klara e o Sol', author:'Kazuo Ishiguro', coverTxt:'Klara\ne o Sol', bg:'linear-gradient(135deg,#1A3A4A,#0A2030)', why:'Bateria Fraca + Profundidade. Acolhimento com densidade — exatamente o que você precisa agora.', group:'Grupo Pausa', desc:'15 min/dia · Empatia e ritmo lento', icon:'🌿' },
+  '2-1':{ title:'A Metamorfose', author:'Franz Kafka', coverTxt:'A\nMetamorfose', bg:'linear-gradient(135deg,#2A1A4A,#180A30)', why:'Expansão + Profundidade. Um clássico que expande sua lente sobre identidade e existência em menos de 100 páginas.', group:'Grupo Reflexão', desc:'30 min+/dia · Debate e análise', icon:'💡' }
+};
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function onBook(v) {
+  const w=document.getElementById('energy-wrap');
+  if(v.length>2) w.classList.add('open');
+  else { w.classList.remove('open'); state.energy=-1; document.getElementById('btn1').disabled=true; }
+}
+function selE(i,btn) {
+  document.querySelectorAll('.e-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); state.energy=i;
+  document.getElementById('btn1').disabled=false;
+}
+const pf={'affinity':'a','mood':'m','speed':'v'};
+const bf={'affinity':'btn2','mood':'btn3','speed':'btn4'};
+function selCard(t,i,n) {
+  for(let k=0;k<n;k++) document.getElementById(pf[t]+k).classList.remove('sel');
+  document.getElementById(pf[t]+i).classList.add('sel');
+  state[t]=i; document.getElementById(bf[t]).disabled=false;
+}
+function startLoad() {
+  go('s-load');
+  setTimeout(buildDelivery,2300);
+}
+function buildDelivery() {
+  const k=state.affinity+'-'+state.mood;
+  const b=books[k]||books['1-1'];
+  document.getElementById('book-face').style.background=b.bg;
+  document.getElementById('cover-txt').innerText=b.coverTxt;
+  document.getElementById('d-title').innerText=b.title;
+  document.getElementById('d-author').innerText=b.author;
+  document.getElementById('d-why').innerText=b.why;
+  document.getElementById('d-icon').innerText=b.icon;
+  document.getElementById('d-group').innerText=b.group;
+  document.getElementById('d-desc').innerText=b.desc;
+  go('s6');
+}
+</script>
+</body>
+</html>

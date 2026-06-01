@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travez — Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:       #F3E8DB;
+  --bg2:      #FFFFFF;
+  --bg3:      #FAF6F1;
+  --bg4:      #F0E8DC;
+  --cream:    #1E3A2F;
+  --cream2:   #2D5243;
+  --muted:    #7A8A70;
+  --gold:     #C26A3A;
+  --gold-dim: rgba(194,106,58,0.10);
+  --border:   rgba(30,58,47,0.08);
+  --bord-g:   rgba(194,106,58,0.20);
+}
+
+html { -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+
+body {
+  background: radial-gradient(ellipse 70% 50% at 30% 20%, #DDD0C4 0%, #C3B49E 100%);
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh;
+  font-family:'Inter',sans-serif;
+}
+
+/* ── Phone ─────────────────────────────────── */
+.phone {
+  width:390px; height:844px;
+  background: var(--bg);
+  border-radius:52px; overflow:hidden;
+  position:relative;
+  box-shadow:
+    0 0 0 1px rgba(30,58,47,0.06),
+    0 60px 120px rgba(30,58,47,0.28),
+    0 0 80px rgba(194,106,58,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.phone::before {
+  content:'';
+  position:absolute; top:14px; left:50%;
+  transform:translateX(-50%);
+  width:118px; height:34px;
+  background:#E2D6C8; border-radius:20px; z-index:100;
+}
+
+/* ── Screens ────────────────────────────────── */
+.screen {
+  position:absolute; inset:0;
+  opacity:0; transform:translateX(20px) scale(0.99);
+  pointer-events:none;
+  transition:opacity .4s cubic-bezier(.4,0,.2,1), transform .4s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto; scrollbar-width:none;
+}
+.screen::-webkit-scrollbar { display:none; }
+.screen.active { opacity:1; transform:translateX(0) scale(1); pointer-events:all; }
+
+/* ── Progress ───────────────────────────────── */
+.progress { display:flex; gap:5px; margin-bottom:36px; }
+.p-dot {
+  height:2px; flex:1; border-radius:2px;
+  background:rgba(30,58,47,0.10);
+  transition:background .4s;
+}
+.p-dot.on { background:var(--gold); }
+
+/* ── Back ───────────────────────────────────── */
+.back {
+  display:inline-flex; align-items:center; gap:5px;
+  color:var(--muted); font-size:13px; cursor:pointer;
+  margin-bottom:26px; background:none; border:none;
+  font-family:'Inter',sans-serif; transition:color .2s;
+}
+.back:hover { color:var(--cream2); }
+
+/* ── AI label + message ─────────────────────── */
+.ai-lbl {
+  font-size:9px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:10px; opacity:.9;
+}
+.ai-msg {
+  font-family:'Lora',serif;
+  font-size:22px; line-height:1.48; letter-spacing:-.01em;
+  color:var(--cream); margin-bottom:28px;
+}
+
+/* ── Cards ──────────────────────────────────── */
+.card {
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:18px; padding:18px 20px;
+  margin-bottom:10px; cursor:pointer;
+  transition:border-color .2s, background .2s, transform .15s, box-shadow .2s;
+  user-select:none;
+}
+.card:hover {
+  border-color:var(--bord-g);
+  background:var(--bg3);
+  box-shadow:0 4px 20px rgba(30,58,47,0.07);
+}
+.card:active { transform:scale(.985); }
+.card.sel {
+  border-color:var(--gold);
+  background:linear-gradient(160deg,rgba(194,106,58,.06) 0%,rgba(194,106,58,.02) 100%);
+  box-shadow:0 0 0 1px rgba(194,106,58,.08), 0 4px 20px rgba(30,58,47,0.06);
+}
+.card-hdr { display:flex; justify-content:space-between; align-items:flex-start; }
+.card-title {
+  font-family:'Lora',serif;
+  font-size:15px; font-weight:600; color:var(--cream); margin-bottom:5px;
+  letter-spacing:-.005em;
+}
+.card-desc { font-size:12.5px; color:var(--muted); line-height:1.6; }
+.chk {
+  width:18px; height:18px; border-radius:50%;
+  border:1.5px solid rgba(30,58,47,.15);
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; flex-shrink:0;
+}
+.card.sel .chk { background:var(--gold); border-color:var(--gold); }
+.card.sel .chk::after { content:'✓'; font-size:9px; font-weight:800; color:#F3E8DB; }
+
+/* ── Input ──────────────────────────────────── */
+.field {
+  background:var(--bg2);
+  border:1.5px solid var(--border); border-radius:14px;
+  padding:15px 16px; color:var(--cream);
+  font-size:15px; font-family:'Inter',sans-serif;
+  width:100%; outline:none; transition:border-color .2s, box-shadow .2s;
+}
+.field:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(194,106,58,.08); }
+.field::placeholder { color:rgba(138,114,96,.45); }
+
+/* ── Energy ─────────────────────────────────── */
+.energy-wrap { max-height:0; overflow:hidden; transition:max-height .45s cubic-bezier(.4,0,.2,1); }
+.energy-wrap.open { max-height:130px; }
+.e-lbl { font-size:12.5px; color:var(--muted); margin:20px 0 12px; }
+.e-btns { display:flex; gap:8px; }
+.e-btn {
+  flex:1; padding:11px 0;
+  background:var(--bg2);
+  border:1.5px solid var(--border); border-radius:11px;
+  color:var(--muted); font-size:13.5px;
+  font-family:'Inter',sans-serif; cursor:pointer; transition:all .2s;
+}
+.e-btn:hover { border-color:var(--bord-g); color:var(--cream2); }
+.e-btn.sel {
+  background:rgba(194,106,58,.06);
+  border-color:var(--gold); color:var(--gold);
+}
+
+/* ── Button ─────────────────────────────────── */
+.btn {
+  width:100%; padding:17px;
+  background:linear-gradient(135deg,#C26A3A 0%,#9E5228 100%);
+  border:none; border-radius:15px;
+  color:#F3E8DB; font-size:15px; font-weight:600;
+  font-family:'Inter',sans-serif; cursor:pointer;
+  transition:filter .2s, transform .15s, opacity .2s;
+  margin-top:auto; flex-shrink:0;
+  box-shadow:0 4px 20px rgba(194,106,58,.30), 0 1px 0 rgba(255,255,255,.15) inset;
+  letter-spacing:-.01em;
+}
+.btn:hover:not(:disabled) { filter:brightness(1.06); transform:translateY(-1px); box-shadow:0 6px 28px rgba(194,106,58,.35); }
+.btn:active:not(:disabled) { transform:scale(.98); }
+.btn:disabled { opacity:.3; cursor:not-allowed; }
+
+.btn-ghost {
+  width:100%; padding:13px;
+  background:none; border:none;
+  color:var(--muted); font-size:13.5px;
+  font-family:'Inter',sans-serif;
+  cursor:pointer; text-align:center;
+  margin-top:10px; transition:color .2s; flex-shrink:0;
+}
+.btn-ghost:hover { color:var(--cream2); }
+
+/* ── Welcome ────────────────────────────────── */
+#s1 { padding:0 0 46px; display:flex; flex-direction:column; position:relative; }
+
+.hero-wrap {
+  position:relative; width:100%; height:340px; flex-shrink:0;
+  border-radius:0; overflow:hidden;
+}
+.hero-wrap img {
+  width:100%; height:100%; object-fit:cover; object-position:center 30%;
+  display:block;
+}
+.hero-wrap::after {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom,
+    rgba(243,232,219,0) 0%,
+    rgba(243,232,219,0) 40%,
+    rgba(243,232,219,0.75) 70%,
+    rgba(243,232,219,1) 100%);
+}
+
+.w-content {
+  padding:0 32px;
+}
+
+#s1 .logo {
+  position:absolute; top:72px; left:32px; z-index:10;
+}
+.logo {
+  display:inline-flex; align-items:center; gap:9px;
+  font-family:'Lora',serif;
+  font-size:26px; font-weight:700; letter-spacing:.02em;
+  color:#FFFFFF;
+  text-shadow:0 1px 8px rgba(0,0,0,0.35);
+}
+.logo svg { flex-shrink:0; filter:drop-shadow(0 1px 4px rgba(0,0,0,0.25)); }
+.w-body { flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom:10px; }
+.w-eyebrow {
+  font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:22px; opacity:.75;
+}
+.w-line {
+  width:32px; height:1.5px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+  margin-bottom:20px; opacity:.55;
+}
+.w-h {
+  font-family:'Lora',serif;
+  font-size:40px; line-height:1.15; letter-spacing:-.02em;
+  color:var(--cream); margin-bottom:18px;
+  font-weight:700;
+}
+.w-sub {
+  font-size:14px; line-height:1.8;
+  color:var(--muted); margin-bottom:40px;
+}
+
+/* ── Steps ──────────────────────────────────── */
+.step-screen { padding:68px 32px 44px; display:flex; flex-direction:column; }
+
+/* ── Loading ────────────────────────────────── */
+#s-load { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.load-t {
+  font-family:'Lora',serif;
+  font-size:19px; line-height:1.55; letter-spacing:-.01em;
+  color:var(--cream); text-align:center; margin-bottom:28px;
+}
+.dots { display:flex; gap:10px; }
+.dot {
+  width:7px; height:7px; border-radius:50%; background:var(--gold);
+  animation:blink 1.3s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay:.22s; }
+.dot:nth-child(3) { animation-delay:.44s; }
+@keyframes blink {
+  0%,80%,100% { opacity:.15; transform:scale(.7); }
+  40%         { opacity:1;   transform:scale(1);  }
+}
+
+/* ── Delivery ───────────────────────────────── */
+#s6 { padding:52px 32px 44px; display:flex; flex-direction:column; }
+.d-scroll { flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:16px; }
+.d-scroll::-webkit-scrollbar { display:none; }
+.d-eyebrow {
+  font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); text-align:center; margin-bottom:22px; opacity:.9;
+}
+
+/* Book cover 3-D */
+.book-wrap {
+  display:flex; justify-content:center;
+  margin-bottom:24px; perspective:600px;
+}
+.book-3d {
+  width:108px; height:154px;
+  border-radius:4px 8px 8px 4px;
+  position:relative;
+  transform:rotateY(-14deg);
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+  filter:
+    drop-shadow(-6px 6px 18px rgba(30,58,47,.22))
+    drop-shadow(-2px 2px 6px rgba(30,58,47,.14));
+}
+.book-3d:hover { transform:rotateY(-6deg); }
+.book-face {
+  position:absolute; inset:0;
+  border-radius:4px 8px 8px 4px;
+  display:flex; align-items:flex-end; padding:10px;
+  overflow:hidden;
+}
+.book-face img {
+  position:absolute; inset:0;
+  width:100%; height:100%; object-fit:cover;
+  border-radius:4px 8px 8px 4px;
+}
+.book-face.has-image .book-face-title { display:none; }
+.book-face::after {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(to right, rgba(0,0,0,.35) 0%, transparent 18%);
+}
+.book-spine {
+  position:absolute; left:0; top:0; bottom:0;
+  width:8px; background:rgba(0,0,0,.5);
+  border-radius:4px 0 0 4px;
+}
+.book-face-title {
+  font-family:'Lora',serif;
+  font-size:11px; color:rgba(255,255,255,.85);
+  line-height:1.4; position:relative; z-index:1;
+}
+
+.d-title {
+  font-family:'Lora',serif;
+  font-size:21px; letter-spacing:-.015em;
+  color:var(--cream); text-align:center; margin-bottom:4px;
+}
+.d-author {
+  font-size:12px; color:var(--gold); text-align:center;
+  letter-spacing:.05em; margin-bottom:18px;
+}
+.d-rule {
+  width:28px; height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:0 auto 16px; opacity:.45;
+}
+.d-why {
+  font-size:13.5px; color:var(--muted); line-height:1.75;
+  text-align:center; margin-bottom:22px; padding:0 4px;
+}
+.group-card {
+  background:var(--bg2);
+  border:1px solid var(--bord-g);
+  border-radius:14px; padding:13px 16px;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:6px;
+}
+.g-icon {
+  width:36px; height:36px;
+  background:var(--gold-dim); border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.g-name { font-size:14px; font-weight:600; color:var(--cream); }
+.g-desc { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* ── Responsive ─────────────────────────────── */
+@media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
+@media (max-height:800px) { .phone { transform:scale(.83); } }
+@media (max-width:420px)  { .phone { width:100vw; height:100vh; border-radius:0; transform:none !important; } }
+</style>
+<link rel="stylesheet" href="assets/theme.css">
+<script src="assets/book-context.js" defer></script>
+<script src="assets/theme.js" defer></script>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ═══ S1: WELCOME ══════════════════════════ -->
+  <div class="screen active" id="s1">
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="#C26A3A">
+        <path d="M12 1 L14 10 L23 12 L14 14 L12 23 L10 14 L1 12 L10 10 Z"/>
+      </svg>
+      <span>travez</span>
+    </div>
+    <div class="hero-wrap">
+      <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=780&q=80&auto=format&fit=crop" alt="">
+    </div>
+    <div class="w-body w-content">
+      <p class="w-eyebrow">Ecossistema de Inteligência Literária</p>
+      <div class="w-line"></div>
+      <h1 class="w-h">Você lê.<br>Mas o quanto<br>realmente fica?</h1>
+      <p class="w-sub">Cada livro é escolhido pelo que você precisa agora — não pelo que o algoritmo acha que você quer.</p>
+    </div>
+    <div class="w-content" style="margin-top:auto;">
+      <button class="btn" onclick="go('s2')">Começar minha jornada</button>
+      <button class="btn-ghost">Já tenho conta</button>
+    </div>
+  </div>
+
+  <!-- ═══ S2: HISTÓRICO ════════════════════════ -->
+  <div class="screen step-screen" id="s2">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot"></div>
+      <div class="p-dot"></div><div class="p-dot"></div>
+    </div>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Qual foi o último livro que você leu?</p>
+    <input class="field" type="text" id="book-field"
+      placeholder="Ex: Atomic Habits, O Alquimista…"
+      oninput="onBook(this.value)" />
+    <div class="energy-wrap" id="energy-wrap">
+      <p class="e-lbl">De 0 a 10, o quanto essa leitura te deu energia?</p>
+      <div class="e-btns">
+        <button class="e-btn" onclick="selE(0,this)">😴 0–3</button>
+        <button class="e-btn" onclick="selE(1,this)">😐 4–6</button>
+        <button class="e-btn" onclick="selE(2,this)">✨ 7–10</button>
+      </div>
+    </div>
+    <div style="flex:1;min-height:20px"></div>
+    <button class="btn" id="btn1" disabled onclick="go('s3')">Continuar</button>
+  </div>
+
+  <!-- ═══ S3: AFINIDADE ════════════════════════ -->
+  <div class="screen step-screen" id="s3">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+      <div class="p-dot"></div><div class="p-dot"></div>
+    </div>
+    <button class="back" onclick="go('s2')">← Voltar</button>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Em uma livraria com 3 estantes, para qual seus pés te levariam?</p>
+    <div class="card" id="a0" onclick="selCard('affinity',0,3)">
+      <div class="card-hdr"><p class="card-title">Vida Real</p><span class="chk"></span></div>
+      <p class="card-desc">Histórias de pessoas, biografias e dramas humanos</p>
+    </div>
+    <div class="card" id="a1" onclick="selCard('affinity',1,3)">
+      <div class="card-hdr"><p class="card-title">Futuro &amp; Estratégia</p><span class="chk"></span></div>
+      <p class="card-desc">Negócios, tecnologia, tendências e novos modelos de pensamento</p>
+    </div>
+    <div class="card" id="a2" onclick="selCard('affinity',2,3)">
+      <div class="card-hdr"><p class="card-title">Profundidade</p><span class="chk"></span></div>
+      <p class="card-desc">Filosofia, psicologia e clássicos que questionam a existência</p>
+    </div>
+    <div style="flex:1;min-height:12px"></div>
+    <button class="btn" id="btn2" disabled onclick="go('s4')">Continuar</button>
+  </div>
+
+  <!-- ═══ S4: ESTADO DE ESPÍRITO ═══════════════ -->
+  <div class="screen step-screen" id="s4">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+      <div class="p-dot on"></div><div class="p-dot"></div>
+    </div>
+    <button class="back" onclick="go('s3')">← Voltar</button>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Como está sua disponibilidade mental esta semana?</p>
+    <div class="card" id="m0" onclick="selCard('mood',0,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">Modo Bateria Fraca</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Quero algo profundo, mas fácil de digerir. Preciso de um respiro.</p>
+    </div>
+    <div class="card" id="m1" onclick="selCard('mood',1,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">Modo Expansão</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Quero ser desafiada. Pode me dar algo denso que mude minha visão de mundo.</p>
+    </div>
+    <div style="flex:1;min-height:12px"></div>
+    <button class="btn" id="btn3" disabled onclick="go('s5')">Continuar</button>
+  </div>
+
+  <!-- ═══ S5: VELOCIDADE ════════════════════════ -->
+  <div class="screen step-screen" id="s5">
+    <div class="progress">
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+      <div class="p-dot on"></div><div class="p-dot on"></div>
+    </div>
+    <button class="back" onclick="go('s4')">← Voltar</button>
+    <p class="ai-lbl">IA Travez</p>
+    <p class="ai-msg">Última pergunta — quanto tempo por dia?</p>
+    <div class="card" id="v0" onclick="selCard('speed',0,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">15 min · Pílulas de Sabedoria</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Ideal para quem tem rotina intensa</p>
+    </div>
+    <div class="card" id="v1" onclick="selCard('speed',1,2)" style="padding:22px 20px">
+      <div class="card-hdr"><p class="card-title">30 min+ · Mergulho Profundo</p><span class="chk"></span></div>
+      <p class="card-desc" style="margin-top:7px">Para quem quer priorizar a leitura agora</p>
+    </div>
+    <div style="flex:1;min-height:12px"></div>
+    <button class="btn" id="btn4" disabled onclick="startLoad()">Ver minha recomendação</button>
+  </div>
+
+  <!-- ═══ LOADING ═══════════════════════════════ -->
+  <div class="screen" id="s-load">
+    <p class="load-t">Analisando<br>seu perfil…</p>
+    <div class="dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- ═══ S6: ENTREGA ═══════════════════════════ -->
+  <div class="screen" id="s6">
+    <div class="d-scroll">
+      <p class="d-eyebrow">Sua intervenção literária</p>
+      <div class="book-wrap">
+        <div class="book-3d" id="book3d">
+          <div class="book-spine"></div>
+          <div class="book-face" id="book-face" style="background:linear-gradient(135deg,#2C4A3E,#1A3028)">
+            <img id="cover-img" src="" alt="" style="display:none">
+            <p class="book-face-title" id="cover-txt">A<br>Metamorfose</p>
+          </div>
+        </div>
+      </div>
+      <h2 class="d-title" id="d-title">A Metamorfose</h2>
+      <p class="d-author" id="d-author">Franz Kafka</p>
+      <div class="d-rule"></div>
+      <p class="d-why" id="d-why">Modo Expansão + Estratégia. Este livro vai te dar o choque de realidade que você busca — uma nova forma de enxergar cada decisão que você toma.</p>
+      <div class="group-card">
+        <div class="g-icon" id="d-icon">⚡</div>
+        <div>
+          <p class="g-name" id="d-group">Grupo Alavanca</p>
+          <p class="g-desc"  id="d-desc">30 min+/dia · Aplicação prática e visão</p>
+        </div>
+      </div>
+    </div>
+    <button class="btn" style="margin-top:16px;flex-shrink:0"
+      onclick="goHome()">Vamos nessa →</button>
+  </div>
+
+</div>
+<script>
+const state = { affinity:-1, mood:-1, speed:-1, energy:-1 };
+const books = {
+  '0-0':{ title:'A Cabeça do Santo', author:'Socorro Acioli', coverTxt:'A Cabeça\ndo Santo', bg:'linear-gradient(135deg,#8A5A2B,#3A2415)', coverImage:'assets/covers/a-cabeca-do-santo.jpg', why:'Bateria Fraca + Vida Real. Uma história que atravessa memória, fé e pertencimento com delicadeza — exatamente o respiro que você precisa agora.', group:'Grupo Pausa', desc:'15 min/dia · Empatia e ritmo lento', icon:'🌿' },
+  '0-1':{ title:'O Poder do Hábito', author:'Charles Duhigg', coverTxt:'O Poder\ndo Hábito', bg:'linear-gradient(135deg,#4A3A1A,#2A200A)', why:'Expansão + Vida Real. Como os padrões que você vive foram construídos — e como mudá-los com precisão.', group:'Grupo Alavanca', desc:'30 min+/dia · Aplicação prática e visão', icon:'⚡' },
+  '1-0':{ title:'Klara e o Sol', author:'Kazuo Ishiguro', coverTxt:'Klara\ne o Sol', bg:'linear-gradient(135deg,#1A3A4A,#0A2030)', why:'Bateria Fraca + Estratégia. Perspectiva sobre tecnologia e humanidade com leveza — densidade sem peso.', group:'Grupo Pausa', desc:'15 min/dia · Empatia e ritmo lento', icon:'🌿' },
+  '1-1':{ title:'A Metamorfose', author:'Franz Kafka', coverTxt:'A\nMetamorfose', bg:'linear-gradient(135deg,#2C4A3E,#1A3028)', why:'Expansão + Estratégia. Uma leitura curta e perturbadora sobre identidade, utilidade e pertencimento — para rever como você habita trabalho e vida.', group:'Grupo Alavanca', desc:'30 min+/dia · Aplicação prática e visão', icon:'⚡' },
+  '2-0':{ title:'Klara e o Sol', author:'Kazuo Ishiguro', coverTxt:'Klara\ne o Sol', bg:'linear-gradient(135deg,#1A3A4A,#0A2030)', why:'Bateria Fraca + Profundidade. Acolhimento com densidade — exatamente o que você precisa agora.', group:'Grupo Pausa', desc:'15 min/dia · Empatia e ritmo lento', icon:'🌿' },
+  '2-1':{ title:'A Metamorfose', author:'Franz Kafka', coverTxt:'A\nMetamorfose', bg:'linear-gradient(135deg,#2A1A4A,#180A30)', why:'Expansão + Profundidade. Um clássico que expande sua lente sobre identidade e existência em menos de 100 páginas.', group:'Grupo Reflexão', desc:'30 min+/dia · Debate e análise', icon:'💡' }
+};
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function onBook(v) {
+  const w=document.getElementById('energy-wrap');
+  if(v.length>2) w.classList.add('open');
+  else { w.classList.remove('open'); state.energy=-1; document.getElementById('btn1').disabled=true; }
+}
+function selE(i,btn) {
+  document.querySelectorAll('.e-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); state.energy=i;
+  document.getElementById('btn1').disabled=false;
+}
+const pf={'affinity':'a','mood':'m','speed':'v'};
+const bf={'affinity':'btn2','mood':'btn3','speed':'btn4'};
+const cn={'affinity':3,'mood':2,'speed':2};
+function selCard(t,i,n) {
+  for(let k=0;k<n;k++) document.getElementById(pf[t]+k).classList.remove('sel');
+  document.getElementById(pf[t]+i).classList.add('sel');
+  state[t]=i; document.getElementById(bf[t]).disabled=false;
+}
+function startLoad() {
+  go('s-load');
+  setTimeout(buildDelivery,2300);
+}
+function buildDelivery() {
+  const k=state.affinity+'-'+state.mood;
+  const b=books[k]||books['1-1'];
+  window._deliveredBook = b;
+  const face = document.getElementById('book-face');
+  const img  = document.getElementById('cover-img');
+  face.style.background = b.bg;
+  if (b.coverImage) {
+    img.src = b.coverImage;
+    img.style.display = 'block';
+    face.classList.add('has-image');
+  } else {
+    img.style.display = 'none';
+    face.classList.remove('has-image');
+  }
+  document.getElementById('cover-txt').innerText=b.coverTxt;
+  document.getElementById('d-title').innerText=b.title;
+  document.getElementById('d-author').innerText=b.author;
+  document.getElementById('d-why').innerText=b.why;
+  document.getElementById('d-icon').innerText=b.icon;
+  document.getElementById('d-group').innerText=b.group;
+  document.getElementById('d-desc').innerText=b.desc;
+  go('s6');
+}
+function goHome() {
+  const b = window._deliveredBook;
+  if (b) {
+    window.MentorBookContext?.save?.({
+      title: b.title,
+      author: b.author,
+      coverTitle: b.coverTxt,
+      coverColor: b.bg,
+      coverImage: b.coverImage || '',
+      status: 'Em andamento'
+    });
+  }
+  window.location.href = 'home.html';
+}
+</script>
+</body>
+</html>

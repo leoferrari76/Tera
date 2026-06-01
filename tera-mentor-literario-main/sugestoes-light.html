@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor de Evolução — Sugestões da IA Travez</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --paper:#F6F0E8; --paper2:#EDE6DA; --ink:#1C1610;
+  --ink2:#48392A; --ink3:#8C7B68; --crim:#BF4B1C;
+  --crim-lt:#D96A3A; --border:rgba(28,22,16,.09);
+}
+html { -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+body {
+  background:radial-gradient(ellipse 80% 70% at 25% 15%,#EDD8C0 0%,#D4BFA0 55%,#C6AB8A 100%);
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; font-family:'DM Sans',sans-serif;
+}
+.phone {
+  width:390px; height:844px; background:var(--paper);
+  border-radius:52px; overflow:hidden; position:relative;
+  box-shadow:0 0 0 1px rgba(28,22,16,.10),0 40px 90px rgba(28,22,16,.28),0 8px 24px rgba(28,22,16,.12),inset 0 1px 0 rgba(255,255,255,.9);
+}
+.phone::before {
+  content:''; position:absolute; top:14px; left:50%;
+  transform:translateX(-50%);
+  width:118px; height:34px; background:#1C1610; border-radius:20px; z-index:100;
+}
+.phone::after {
+  content:''; position:absolute; inset:0; z-index:9998; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size:180px 180px; opacity:.038; mix-blend-mode:multiply; border-radius:52px;
+}
+.page {
+  height:100%; overflow-y:auto; scrollbar-width:none;
+  padding:92px 34px 46px;
+}
+.page::-webkit-scrollbar { display:none; }
+.eyebrow {
+  font-size:9px; font-weight:500; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--crim); margin-bottom:12px;
+}
+h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:34px; line-height:1.08; letter-spacing:-.025em;
+  color:var(--ink); margin-bottom:12px; font-style:italic; font-weight:300;
+}
+.intro {
+  font-size:13px; color:var(--ink3); line-height:1.75;
+  margin-bottom:22px;
+}
+.travez-panel {
+  background:rgba(191,75,28,.055);
+  border:1px solid rgba(191,75,28,.14); border-radius:18px;
+  padding:16px; margin-bottom:16px;
+}
+.travez-question {
+  font-family:'Cormorant Garamond',serif;
+  font-size:23px; line-height:1.2; color:var(--ink);
+  font-style:italic; font-weight:400; margin-bottom:14px;
+}
+.travez-options { display:flex; flex-direction:column; gap:10px; }
+.travez-option {
+  width:100%; padding:14px;
+  background:rgba(255,255,255,.66);
+  border:1px solid var(--border); border-radius:14px;
+  color:var(--ink2); font-size:13px; line-height:1.35;
+  font-family:'DM Sans',sans-serif; text-align:left; cursor:pointer;
+  transition:border-color .2s, background .2s, transform .15s;
+}
+.travez-option:hover,
+.travez-option.selected {
+  border-color:rgba(191,75,28,.34);
+  background:rgba(191,75,28,.08);
+  transform:translateY(-1px);
+}
+.travez-option:disabled { cursor:wait; opacity:.72; transform:none; }
+.travez-status {
+  font-size:12.5px; color:var(--ink3); line-height:1.55;
+  padding:2px 0 14px; font-style:italic;
+}
+.travez-status.error { color:var(--crim); }
+.travez-results { display:flex; flex-direction:column; gap:14px; }
+.travez-rec {
+  background:rgba(255,255,255,.68);
+  border:1px solid var(--border); border-radius:16px;
+  padding:16px; box-shadow:0 8px 22px rgba(28,22,16,.055);
+}
+.rec-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:23px; color:var(--ink); line-height:1.1;
+  font-style:italic; font-weight:500;
+}
+.rec-author { font-size:12px; color:var(--crim); margin:4px 0 14px; }
+.rec-label {
+  font-size:8.5px; font-weight:600; letter-spacing:.17em; text-transform:uppercase;
+  color:var(--crim); margin-bottom:5px;
+}
+.rec-text { font-size:12.8px; color:var(--ink2); line-height:1.62; margin-bottom:11px; }
+.rec-invite {
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px; color:var(--ink); line-height:1.42;
+  font-style:italic; margin-bottom:14px;
+}
+.amazon-link {
+  display:inline-flex; justify-content:center; align-items:center;
+  width:100%; min-height:42px; padding:12px 14px;
+  background:linear-gradient(135deg,#BF4B1C,#D96A3A);
+  border-radius:13px; color:var(--paper); text-decoration:none;
+  font-size:13.5px; font-weight:600;
+  box-shadow:0 4px 15px rgba(191,75,28,.16), inset 0 1px 0 rgba(255,255,255,.16);
+}
+@media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
+@media (max-height:800px) { .phone { transform:scale(.83); } }
+@media (max-width:420px) { .phone { width:100vw; height:100vh; border-radius:0; transform:none !important; } .page { padding:88px 28px 40px; } }
+</style>
+<link rel="stylesheet" href="assets/theme.css">
+<script src="assets/book-context.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script src="assets/travez.js" defer></script>
+</head>
+<body>
+<div class="phone">
+  <main class="page">
+    <p class="eyebrow">IA Travez</p>
+    <h1>Uma próxima leitura, escolhida com intenção.</h1>
+    <p class="intro" id="suggestion-intro">Você acabou de atravessar A Metamorfose. Agora, Travez pode sugerir uma nova experiência literária a partir do que essa obra deixou em movimento.</p>
+
+    <section class="travez-panel">
+      <p class="travez-question">Que tipo de próxima experiência literária você deseja?</p>
+      <div class="travez-options">
+        <button class="travez-option" type="button" data-option="same_author" onclick="chooseTravezOption('same_author')">Quero conhecer mais obras do mesmo autor</button>
+        <button class="travez-option" type="button" data-option="similar_style_or_theme" onclick="chooseTravezOption('similar_style_or_theme')">Quero algo parecido em estilo ou tema</button>
+        <button class="travez-option" type="button" data-option="completely_new" onclick="chooseTravezOption('completely_new')">Quero uma experiência completamente nova</button>
+      </div>
+    </section>
+
+    <p class="travez-status" id="travez-status" hidden></p>
+    <div class="travez-results" id="travez-results"></div>
+  </main>
+</div>
+</body>
+</html>
