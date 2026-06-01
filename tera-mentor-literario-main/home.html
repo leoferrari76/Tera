@@ -61,7 +61,7 @@ body {
 
 .home-scroll {
   flex:1; overflow-y:auto; scrollbar-width:none;
-  padding:0 24px 20px;
+  padding:0 24px 92px;
 }
 .home-scroll::-webkit-scrollbar { display:none; }
 
@@ -280,10 +280,10 @@ body {
 /* Tab bar */
 .tab-bar {
   position:absolute; bottom:0; left:0; right:0; height:var(--tab-h);
-  background:rgba(244,237,226,.96); backdrop-filter:blur(24px);
+  background:rgba(243,232,219,.96); backdrop-filter:blur(24px);
   border-top:1px solid rgba(30,58,47,.06);
   display:flex; align-items:center; justify-content:space-around;
-  padding:0 16px 12px; z-index:50;
+  padding:0 16px 12px; z-index:60;
 }
 .tab { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:.35; transition:opacity .2s; flex:1; }
 .tab.on { opacity:1; }
@@ -376,7 +376,7 @@ body {
 
 /* Chat input */
 .chat-bar {
-  padding:10px 16px 22px; background:var(--bg);
+  padding:10px 16px 82px; background:var(--bg);
   border-top:1px solid rgba(30,58,47,.06);
   display:flex; align-items:center; gap:10px; flex-shrink:0;
 }
@@ -455,11 +455,6 @@ body {
 
     </div>
 
-    <div class="tab-bar">
-      <div class="tab on"><span class="tab-ico">🏠</span><span class="tab-lbl">Início</span></div>
-      <div class="tab" onclick="go('sala')"><span class="tab-ico">💬</span><span class="tab-lbl">Sala</span></div>
-      <div class="tab"><span class="tab-ico">👤</span><span class="tab-lbl">Perfil</span></div>
-    </div>
   </div>
 
   <!-- ══ SALA ════════════════════════════════════ -->
@@ -547,6 +542,13 @@ body {
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
+  </div>
+
+  <!-- Tab bar — persistente em todas as telas -->
+  <div class="tab-bar">
+    <div class="tab on" id="tab-home" onclick="go('home')"><span class="tab-ico">🏠</span><span class="tab-lbl">Início</span></div>
+    <div class="tab" id="tab-sala" onclick="go('sala')"><span class="tab-ico">💬</span><span class="tab-lbl">Sala</span></div>
+    <div class="tab" id="tab-perfil"><span class="tab-ico">👤</span><span class="tab-lbl">Perfil</span></div>
   </div>
 
 </div>
@@ -680,7 +682,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function go(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  if(id==='home') document.getElementById('tab-home')?.classList.add('on');
   if(id==='sala') {
+    document.getElementById('tab-sala')?.classList.add('on');
     const b = books[bookIndex];
     const chatBook = document.querySelector('#sala .chat-book');
     if (chatBook && b) chatBook.textContent = b.title;

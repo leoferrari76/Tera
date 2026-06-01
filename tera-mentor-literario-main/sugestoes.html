@@ -30,9 +30,27 @@ body {
 }
 .page {
   height:100%; overflow-y:auto; scrollbar-width:none;
-  padding:92px 32px 44px;
+  padding:92px 32px 116px;
 }
 .page::-webkit-scrollbar { display:none; }
+.back-btn {
+  position:absolute; top:58px; left:24px; z-index:10;
+  display:inline-flex; align-items:center; gap:5px;
+  color:var(--muted); font-size:13px; cursor:pointer;
+  background:none; border:none; font-family:'Inter',sans-serif; transition:color .2s;
+}
+.back-btn:hover { color:var(--cream); }
+.tab-bar {
+  position:absolute; bottom:0; left:0; right:0; height:72px;
+  background:rgba(243,232,219,.96); backdrop-filter:blur(24px);
+  border-top:1px solid rgba(30,58,47,.06);
+  display:flex; align-items:center; justify-content:space-around;
+  padding:0 16px 12px; z-index:60;
+}
+.tab { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:.35; transition:opacity .2s; flex:1; }
+.tab.on { opacity:1; }
+.tab-ico { font-size:20px; }
+.tab-lbl { font-size:10px; color:var(--muted); font-weight:500; letter-spacing:.04em; }
 .eyebrow {
   font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
   color:var(--gold); opacity:.75; margin-bottom:10px;
@@ -121,6 +139,7 @@ h1 {
 </head>
 <body>
 <div class="phone">
+  <button class="back-btn" onclick="history.back()">← Voltar</button>
   <main class="page">
     <p class="eyebrow">IA Travez</p>
     <h1>Uma próxima leitura, escolhida com intenção.</h1>
@@ -138,6 +157,14 @@ h1 {
     <p class="travez-status" id="travez-status" hidden></p>
     <div class="travez-results" id="travez-results"></div>
   </main>
+
+  <!-- Tab bar — persistente -->
+  <div class="tab-bar">
+    <div class="tab on" onclick="window.location.href='home.html'"><span class="tab-ico">🏠</span><span class="tab-lbl">Início</span></div>
+    <div class="tab" onclick="window.location.href='home.html'"><span class="tab-ico">💬</span><span class="tab-lbl">Sala</span></div>
+    <div class="tab"><span class="tab-ico">👤</span><span class="tab-lbl">Perfil</span></div>
+  </div>
+
 </div>
 </body>
 </html>
