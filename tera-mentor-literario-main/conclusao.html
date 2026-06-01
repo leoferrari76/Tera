@@ -469,6 +469,98 @@ body {
 .resp-av svg    { width:20px; height:20px; stroke-width:1.75; }
 .g-icon svg     { width:16px; height:16px; stroke-width:1.75; }
 
+/* ══ S-CHAT — CHAT COM O AUTOR ═════════════ */
+#s-chat { display:flex; flex-direction:column; overflow:hidden; }
+.chat-hdr {
+  flex-shrink:0; display:flex; align-items:center; gap:12px;
+  padding:58px 20px 16px; background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+.chat-back {
+  background:none; border:none; cursor:pointer; color:var(--muted);
+  padding:0; flex-shrink:0; display:flex; align-items:center;
+  justify-content:center; width:32px; height:32px; border-radius:50%;
+  transition:background .2s;
+}
+.chat-back:hover { background:rgba(30,58,47,.06); }
+.chat-back svg { width:20px; height:20px; stroke-width:2; }
+.author-av {
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,var(--cream),var(--cream2));
+  color:var(--bg); font-size:12px; font-weight:700; font-family:'Lora',serif;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; letter-spacing:.04em;
+}
+.author-nm { font-size:14px; font-weight:600; color:var(--cream); letter-spacing:-.01em; }
+.author-sub { font-size:11.5px; color:var(--muted); margin-top:1px; }
+
+.chat-msgs {
+  flex:1; overflow-y:auto; scrollbar-width:none;
+  padding:20px 20px 12px;
+  display:flex; flex-direction:column; gap:14px;
+}
+.chat-msgs::-webkit-scrollbar { display:none; }
+
+.msg-author { display:flex; align-items:flex-end; gap:8px; }
+.msg-av-mini {
+  width:26px; height:26px; border-radius:50%;
+  background:linear-gradient(135deg,var(--cream),var(--cream2));
+  color:var(--bg); font-size:8px; font-weight:700; font-family:'Lora',serif;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; letter-spacing:.04em;
+}
+.bubble-author {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:18px 18px 18px 4px;
+  padding:13px 16px; max-width:78%;
+  font-family:'Lora',serif; font-size:14px; line-height:1.72;
+  color:var(--cream); font-style:italic;
+  box-shadow:0 2px 10px rgba(30,58,47,.05);
+  animation:bubble-in .35s ease-out;
+}
+.msg-user { display:flex; justify-content:flex-end; }
+.bubble-user {
+  background:linear-gradient(135deg,#C26A3A,#9E5228);
+  border-radius:18px 18px 4px 18px;
+  padding:12px 16px; max-width:72%;
+  font-size:13.5px; color:#F3E8DB; line-height:1.6; font-weight:500;
+  animation:bubble-in .3s ease-out;
+}
+@keyframes bubble-in {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.typing-bubble {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:18px 18px 18px 4px;
+  padding:12px 16px; display:flex; gap:5px; align-items:center;
+}
+.typing-dot {
+  width:6px; height:6px; border-radius:50%; background:var(--muted);
+  animation:tdot 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay:.2s; }
+.typing-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes tdot {
+  0%,60%,100% { opacity:.2; transform:scale(.7); }
+  30%         { opacity:1;  transform:scale(1); }
+}
+.chat-replies {
+  flex-shrink:0; padding:12px 16px 88px;
+  border-top:1px solid var(--border); background:var(--bg);
+  display:flex; flex-direction:column; gap:8px;
+}
+.reply-chip {
+  width:100%; padding:12px 16px;
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  font-family:'Inter',sans-serif; font-size:13.5px; color:var(--cream2);
+  cursor:pointer; text-align:left;
+  transition:border-color .2s, background .2s, transform .15s;
+}
+.reply-chip:hover { border-color:var(--bord-g); background:var(--bg3); }
+.reply-chip:active { transform:scale(.98); }
+.chat-actions { display:flex; flex-direction:column; gap:10px; }
+
 /* Responsive */
 @media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
 @media (max-height:800px) { .phone { transform:scale(.83); } }
@@ -506,7 +598,21 @@ body {
 
     <p class="c-sub">"Antes de partir para uma próxima experiência literária, vamos aprofundar o que essa obra moveu em você."</p>
 
-    <button class="btn" onclick="startDeepening()">Aprofundar minha leitura</button>
+    <button class="btn" onclick="startChat()">Aprofundar minha leitura</button>
+  </div>
+
+  <!-- ══ S-CHAT: CHAT COM O AUTOR ══════════════ -->
+  <div class="screen" id="s-chat">
+    <div class="chat-hdr">
+      <button class="chat-back" onclick="go('s1')"><i data-lucide="chevron-left"></i></button>
+      <div class="author-av" id="author-av">FK</div>
+      <div>
+        <p class="author-nm" id="author-nm">Franz Kafka</p>
+        <p class="author-sub" id="author-sub">Autor · A Metamorfose</p>
+      </div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-replies" id="chat-replies"></div>
   </div>
 
   <!-- ══ S2: APROFUNDAMENTO GUIADO ══════════════ -->
@@ -724,6 +830,169 @@ function renderDeepening(sections) {
 async function startDeepening() {
   go('s-deep');
   renderDeepening(await getDeepening());
+}
+
+/* ── CHAT COM O AUTOR ─────────────────────── */
+const AUTHOR_SCRIPTS = {
+  'Franz Kafka': {
+    avatar:'FK',
+    opening:'Você chegou ao fim. Gregor também chegou — à sua própria dissolução. O que mais ficou com você dessa leitura?',
+    rounds:[
+      { chips:[
+        { label:'A transformação em si',   authorReply:'A metamorfose é o que todos veem — mas o que me ocupava era a reação. Uma família que precisava de Gregor produtivo não sabia o que fazer com Gregor presença. Isso te lembrou algo da sua própria vida?' },
+        { label:'A reação da família',     authorReply:'Sim. A família não é monstruosa — é apenas normal. E essa normalidade é o que mais assusta. Você se viu em algum desses personagens?' },
+        { label:'O silêncio do Gregor',    authorReply:'Gregor perde a voz e, com ela, a condição de ser ouvido. Mas ele continua pensando e sentindo. Há algo em você que também observa em silêncio enquanto o mundo segue?' },
+        { label:'O final da obra',         authorReply:'O final alivia — mas para quem? Para a família, que podia seguir. Não para Gregor. Essa diferença entre alívio e resolução era o que eu queria deixar em aberto.' }
+      ]},
+      { chips:[
+        { label:'Sim, isso me tocou',       authorReply:'Então a obra cumpriu o que eu esperava: deixar um incômodo produtivo. Não um manual — uma perturbação útil. Leve isso com você.' },
+        { label:'De uma forma diferente',   authorReply:'Diferente também é chegar. Cada leitura é única — e a sua é válida mesmo que não seja o que eu imaginei quando escrevi.' },
+        { label:'Ainda estou processando',  authorReply:'Esse é o estado mais honesto depois de uma boa leitura. Não force uma conclusão. Continue com esse processamento — ele vai te dizer mais do que qualquer resposta imediata.' }
+      ]}
+    ],
+    closing:'Obrigado por ter chegado até o fim. Poucos chegam. E isso já diz algo sobre quem você é como leitor.'
+  },
+  'Socorro Acioli': {
+    avatar:'SA',
+    opening:'A Cabeça do Santo chegou às suas mãos. Me diz — o que você enxergou no Samuel além de um garoto perdido no mundo?',
+    rounds:[
+      { chips:[
+        { label:'Uma busca por pertencer',  authorReply:'Exatamente. Samuel quer pertencer sem abrir mão de quem ele é. Essa tensão entre identidade e comunidade foi o que mais quis explorar. Você sente isso também, de alguma forma?' },
+        { label:'A fé como linguagem',      authorReply:'A fé no livro não é dogma — é linguagem. Samuel a usa para dar sentido ao que não cabe em palavras comuns. Que linguagem você usa para as coisas que também não cabem?' },
+        { label:'O Brasil interior',        authorReply:'O sertão não é cenário — é personagem. Ele pressiona, molda, revela. Quis que o leitor sentisse a terra como uma força viva. Funcionou pra você?' }
+      ]},
+      { chips:[
+        { label:'Muito, ficou em mim',       authorReply:'Fico feliz. Escrever é uma conversa diferida — você escreve sem saber quem vai ler. Saber que chegou até você como devia é o maior presente que um livro pode dar.' },
+        { label:'De uma forma diferente',    authorReply:'Diferente também é chegar. Cada leitura é única — e a sua é válida mesmo que não seja a que eu imaginei quando escrevi Samuel.' },
+        { label:'Ainda estou sentindo',      authorReply:'Deixa sentir. Não explique ainda. Às vezes os melhores livros precisam de tempo para revelar o que plantaram.' }
+      ]}
+    ],
+    closing:'Escrever a Cabeça do Santo foi um ato de fé também da minha parte. Obrigada por ter completado esse círculo.'
+  }
+};
+
+function getAuthorScript() {
+  const author=(completedBook.author||'').trim();
+  if(AUTHOR_SCRIPTS[author]) return AUTHOR_SCRIPTS[author];
+  const parts=author.split(' ').filter(Boolean);
+  const avatar=parts.length>=2?(parts[0][0]+parts[parts.length-1][0]).toUpperCase():author.slice(0,2).toUpperCase()||'AU';
+  const title=completedBook.title||'esta obra';
+  return {
+    avatar,
+    opening:`Você chegou ao fim de ${title}. Uma jornada como essa deixa marcas. O que ficou mais vivo para você depois desta leitura?`,
+    rounds:[
+      { chips:[
+        { label:'Uma ideia que não sai da cabeça', authorReply:'As ideias que permanecem encontraram solo fértil em você. Não é acidente — o livro encontrou o leitor certo no momento certo.' },
+        { label:'Uma emoção forte',                authorReply:'Emoções fortes durante a leitura são sinais de que a obra tocou em algo verdadeiro. Isso tem valor. Mais do que qualquer análise.' },
+        { label:'Um incômodo ou dúvida',           authorReply:'Incômodo é bom. Livros que apenas confirmam o que você já pensa não expandem — apenas confortam. Fica com essa dúvida um pouco mais.' }
+      ]},
+      { chips:[
+        { label:'Sim, foi marcante',       authorReply:'Fico feliz que tenha chegado aqui. Escrever é uma conversa diferida — você escreve sem saber quem vai ler. Saber que chegou é o maior presente.' },
+        { label:'Ainda estou digerindo',   authorReply:'Leva o tempo que precisar. As melhores leituras plantam sementes que crescem depois, na hora que menos se espera.' },
+        { label:'Foi uma surpresa',        authorReply:'Surpresas são a melhor notícia. Significa que você chegou ao livro sem esperar encontrar o que encontrou. Isso é raro.' }
+      ]}
+    ],
+    closing:`Obrigado por ter chegado ao fim de ${title}. Poucos chegam. E os que chegam, saem diferentes.`
+  };
+}
+
+let chatRound=0, chatScript=null;
+
+function startChat() {
+  chatRound=0;
+  chatScript=getAuthorScript();
+  document.getElementById('author-av').textContent=chatScript.avatar;
+  document.getElementById('author-nm').textContent=completedBook.author||'Autor';
+  document.getElementById('author-sub').textContent=`Autor · ${completedBook.title||'A Metamorfose'}`;
+  document.getElementById('chat-msgs').innerHTML='';
+  document.getElementById('chat-replies').innerHTML='';
+  go('s-chat');
+  lucide.createIcons();
+  setTimeout(()=>{
+    showAuthorTyping(()=>{
+      addAuthorBubble(chatScript.opening);
+      setTimeout(()=>showChatChips(chatScript.rounds[0].chips),400);
+    });
+  },500);
+}
+
+function showAuthorTyping(cb) {
+  const msgs=document.getElementById('chat-msgs');
+  const el=document.createElement('div');
+  el.className='msg-author';
+  el.id='typing-ind';
+  el.innerHTML=`<div class="msg-av-mini">${chatScript.avatar}</div><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  msgs.appendChild(el);
+  scrollChat();
+  setTimeout(()=>{ el.remove(); cb(); },1100);
+}
+
+function addAuthorBubble(text) {
+  const msgs=document.getElementById('chat-msgs');
+  const el=document.createElement('div');
+  el.className='msg-author';
+  el.innerHTML=`<div class="msg-av-mini">${chatScript.avatar}</div><div class="bubble-author">${text}</div>`;
+  msgs.appendChild(el);
+  scrollChat();
+}
+
+function addUserBubble(text) {
+  const msgs=document.getElementById('chat-msgs');
+  const el=document.createElement('div');
+  el.className='msg-user';
+  el.innerHTML=`<div class="bubble-user">${text}</div>`;
+  msgs.appendChild(el);
+  scrollChat();
+}
+
+function showChatChips(chips) {
+  const replies=document.getElementById('chat-replies');
+  replies.innerHTML='';
+  chips.forEach(chip=>{
+    const btn=document.createElement('button');
+    btn.className='reply-chip';
+    btn.textContent=chip.label;
+    btn.onclick=()=>chatPick(chip);
+    replies.appendChild(btn);
+  });
+}
+
+function chatPick(chip) {
+  document.getElementById('chat-replies').innerHTML='';
+  addUserBubble(chip.label);
+  setTimeout(()=>{
+    showAuthorTyping(()=>{
+      addAuthorBubble(chip.authorReply);
+      chatRound++;
+      if(chatRound<chatScript.rounds.length) {
+        setTimeout(()=>showChatChips(chatScript.rounds[chatRound].chips),500);
+      } else {
+        setTimeout(()=>{
+          showAuthorTyping(()=>{
+            addAuthorBubble(chatScript.closing);
+            setTimeout(showChatEnd,500);
+          });
+        },700);
+      }
+    });
+  },400);
+}
+
+function showChatEnd() {
+  const replies=document.getElementById('chat-replies');
+  replies.innerHTML='';
+  const div=document.createElement('div');
+  div.className='chat-actions';
+  div.innerHTML=`
+    <button class="btn" onclick="go('s2')">Escrever minha reflexão</button>
+    <button class="btn-ghost" onclick="startTravezSuggestion()">Quero dicas da IA Travez</button>`;
+  replies.appendChild(div);
+  scrollChat();
+}
+
+function scrollChat() {
+  const msgs=document.getElementById('chat-msgs');
+  setTimeout(()=>msgs.scrollTo({top:msgs.scrollHeight,behavior:'smooth'}),60);
 }
 
 function go(id) {
