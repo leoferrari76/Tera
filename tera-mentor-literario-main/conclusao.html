@@ -87,7 +87,7 @@ body {
 ══════════════════════════════════════════ */
 #s1 {
   display:flex; flex-direction:column; align-items:center;
-  padding:72px 32px 46px; text-align:center; overflow:hidden;
+  padding:72px 32px 96px; text-align:center; overflow:hidden;
 }
 
 /* Glow layers */
@@ -178,7 +178,7 @@ body {
   margin-bottom:28px; font-style:italic; z-index:1;
 }
 
-#s-deep { padding:72px 32px 44px; display:flex; flex-direction:column; }
+#s-deep { padding:72px 32px 96px; display:flex; flex-direction:column; }
 .deep-intro {
   font-size:13.5px; color:var(--muted); line-height:1.75;
   margin-bottom:20px;
@@ -252,7 +252,7 @@ body {
 /* ══════════════════════════════════════════
    S2 — REFLEXÃO
 ══════════════════════════════════════════ */
-#s2 { padding:72px 32px 44px; display:flex; flex-direction:column; }
+#s2 { padding:72px 32px 96px; display:flex; flex-direction:column; }
 
 .ai-lbl {
   font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
@@ -266,7 +266,7 @@ body {
 
 .chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
 .chip {
-  background:linear-gradient(160deg,var(--bg2),#110D07);
+  background:linear-gradient(160deg,var(--bg2),var(--bg3));
   border:1px solid var(--border); border-radius:20px;
   padding:6px 13px; font-size:12px; color:var(--muted);
   cursor:pointer; transition:border-color .2s, color .2s, background .2s;
@@ -282,8 +282,9 @@ body {
   padding:16px; color:var(--cream);
   font-size:14px; line-height:1.75; font-family:'Inter',sans-serif;
   resize:none; outline:none; transition:border-color .2s, box-shadow .2s;
-  margin-bottom:10px;
+  margin-bottom:10px; scrollbar-width:none;
 }
+.r-field::-webkit-scrollbar { display:none; }
 .r-field:focus { border-color:rgba(194,106,58,.35); box-shadow:0 0 0 3px rgba(194,106,58,.07); }
 .r-field::placeholder { color:rgba(138,114,96,.40); }
 .char-c { font-size:11px; color:var(--muted); text-align:right; margin-bottom:16px; opacity:.55; }
@@ -315,7 +316,7 @@ body {
 /* ══════════════════════════════════════════
    S3 — RESPOSTA DA IA
 ══════════════════════════════════════════ */
-#s3 { padding:72px 32px 46px; display:flex; flex-direction:column; }
+#s3 { padding:72px 32px 96px; display:flex; flex-direction:column; }
 
 .resp-hdr { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
 .resp-av {
@@ -373,7 +374,7 @@ body {
 ══════════════════════════════════════════ */
 #s4 {
   display:flex; flex-direction:column; align-items:center;
-  padding:72px 32px 46px; text-align:center;
+  padding:72px 32px 96px; text-align:center;
 }
 
 .next-eyebrow {
@@ -468,7 +469,6 @@ body {
 <link rel="stylesheet" href="assets/theme.css">
 <script src="assets/book-context.js" defer></script>
 <script src="assets/theme.js" defer></script>
-<script src="assets/travez.js" defer></script>
 </head>
 <body>
 <div class="phone">
@@ -516,7 +516,7 @@ body {
         <div class="path-card">
           <p class="path-kicker">Opção 1 — Reflexão</p>
           <p class="path-desc">Compartilhe com outros leitores o que essa leitura provocou em você.</p>
-          <button class="path-btn" type="button">Escrever minha reflexão</button>
+          <button class="path-btn" type="button" onclick="go('s2')">Escrever minha reflexão</button>
         </div>
         <div class="path-card">
           <p class="path-kicker">Opção 2 — IA Travez</p>
@@ -530,7 +530,7 @@ body {
   <!-- ══ S3: REFLEXÃO ═══════════════════════════ -->
   <div class="screen" id="s2">
     <button class="back" onclick="go('s-deep')">← Voltar</button>
-    <div style="padding:72px 32px 44px; display:flex; flex-direction:column; height:100%;">
+    <div style="padding:72px 32px 96px; display:flex; flex-direction:column; height:100%;">
       <p class="ai-lbl">IA Travez</p>
       <p class="ai-msg">O que ficou desta leitura para você?</p>
       <div class="chips">
@@ -554,7 +554,7 @@ body {
 
   <!-- ══ S3: RESPOSTA DA IA ══════════════════════ -->
   <div class="screen" id="s3">
-    <div style="padding:72px 32px 46px; display:flex; flex-direction:column; min-height:100%;">
+    <div style="padding:72px 32px 96px; display:flex; flex-direction:column; min-height:100%;">
       <button class="back" style="position:static;margin-bottom:20px" onclick="go('s2')">← Editar reflexão</button>
       <div class="resp-hdr">
         <div class="resp-av">📖</div>
@@ -720,7 +720,14 @@ async function startDeepening() {
 
 function go(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const el=document.getElementById(id);
+  el.classList.add('active');
+  el.scrollTop=0;
+}
+function startTravezSuggestion() {
+  document.querySelector('#s-load .load-t').innerHTML='Buscando sua<br>próxima leitura…';
+  go('s-load');
+  setTimeout(()=>go('s4'),2200);
 }
 function startLoad() {
   const txt=document.getElementById('reflection').value;
