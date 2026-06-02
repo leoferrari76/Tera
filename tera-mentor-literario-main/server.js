@@ -212,6 +212,10 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'onboarding.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Mentor Literário disponível em http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  app.listen(port, () => {
+    console.log(`Mentor Literário disponível em http://localhost:${port}`);
+  });
+}
+
+module.exports = app;
