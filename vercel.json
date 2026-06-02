@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "tera-mentor-literario-main/server.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "tera-mentor-literario-main/server.js" }
+  ]
+}
