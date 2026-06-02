@@ -561,6 +561,42 @@ body {
 .reply-chip:active { transform:scale(.98); }
 .chat-actions { display:flex; flex-direction:column; gap:10px; }
 
+/* ══ S-TRAVEZ-PICK — opção de leitura ═══ */
+.travez-pick-btn {
+  width:100%; padding:15px 16px;
+  background:var(--bg2);
+  border:1px solid var(--border); border-radius:15px;
+  color:var(--cream2); font-size:13.5px; line-height:1.4;
+  font-family:'Inter',sans-serif; text-align:left; cursor:pointer;
+  transition:border-color .2s, background .2s, transform .15s;
+  box-shadow:0 1px 6px rgba(30,58,47,.04);
+}
+.travez-pick-btn:hover {
+  border-color:rgba(194,106,58,.35); background:var(--bg3); transform:translateY(-1px);
+}
+
+/* ══ S4 — cards de recomendação ═════════ */
+.next-rec-card {
+  background:var(--bg2);
+  border:1px solid var(--border); border-radius:16px;
+  padding:16px; box-shadow:0 2px 10px rgba(30,58,47,.06);
+}
+.next-rec-title {
+  font-family:'Lora',serif;
+  font-size:20px; color:var(--cream); line-height:1.2; margin-bottom:4px;
+}
+.next-rec-author { font-size:12px; color:var(--gold); margin-bottom:12px; }
+.next-rec-label {
+  font-size:8.5px; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--gold); opacity:.72; margin-bottom:5px;
+}
+.next-rec-text { font-size:12.8px; color:var(--cream2); line-height:1.62; margin-bottom:11px; }
+.next-rec-invite {
+  font-family:'Lora',serif;
+  font-size:14px; color:var(--cream); line-height:1.5;
+  font-style:italic; margin-bottom:14px;
+}
+
 /* Responsive */
 @media (max-height:900px) { .phone { transform:scale(.93); transform-origin:center; } }
 @media (max-height:800px) { .phone { transform:scale(.83); } }
@@ -685,33 +721,28 @@ body {
         <p class="share-lbl">Compartilhar reflexão com o Grupo Alavanca</p>
       </div>
       <div style="flex:1;min-height:8px"></div>
-      <button class="btn" onclick="go('s4')">Ver próximo livro</button>
+      <button class="btn" onclick="go('s-travez-pick')">Quero sugestões de leitura</button>
     </div>
   </div>
 
-  <!-- ══ S4: PRÓXIMO LIVRO ══════════════════════ -->
-  <div class="screen" id="s4">
-    <button class="back" onclick="go('s3')">← Voltar</button>
-    <p class="next-eyebrow">Sua próxima intervenção</p>
-    <div class="book-wrap">
-      <div class="book-3d">
-        <div class="b-spine"></div>
-        <div class="b-face" style="background:linear-gradient(135deg,#5C1A1A,#3A0A0A)">
-          <p class="b-title">O Ego<br>é Seu<br>Inimigo</p>
-        </div>
-      </div>
+  <!-- ══ S4: PRÓXIMAS LEITURAS ═════════════════ -->
+  <div class="screen" id="s4" style="padding:56px 28px 96px;">
+    <button class="back" onclick="go('s-travez-pick')">← Voltar</button>
+    <p class="next-eyebrow" style="margin-top:28px;">Suas próximas leituras</p>
+    <p class="c-sub" style="text-align:left;margin-bottom:20px;">3 sugestões da IA Travez para sua próxima experiência literária</p>
+    <div id="rec-list" style="display:flex; flex-direction:column; gap:16px;"></div>
+  </div>
+
+  <!-- ══ S-TRAVEZ-PICK: escolha de opção ══ -->
+  <div class="screen" id="s-travez-pick" style="padding:56px 28px 96px;">
+    <button class="back" onclick="go('s1')">← Voltar</button>
+    <p class="ai-lbl" style="margin-top:28px;">IA Travez</p>
+    <p class="ai-msg" style="margin-bottom:22px;">Que tipo de próxima leitura você quer?</p>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <button class="travez-pick-btn" onclick="pickTravezOption('same_author')">Quero conhecer mais obras do mesmo autor</button>
+      <button class="travez-pick-btn" onclick="pickTravezOption('similar_style_or_theme')">Quero algo parecido em estilo ou tema</button>
+      <button class="travez-pick-btn" onclick="pickTravezOption('completely_new')">Quero uma experiência completamente nova</button>
     </div>
-    <h2 class="next-title">O Ego é Seu Inimigo</h2>
-    <p class="next-author">Ryan Holiday</p>
-    <div class="evol-badge">↑ evolução do seu perfil</div>
-    <div class="why-rule"></div>
-    <p class="next-why">Você saiu dos Jogos com uma nova estratégia de longo prazo. Ryan Holiday vai te mostrar o que pode sabotá-la — por dentro.</p>
-    <div class="group-card">
-      <div class="g-icon"><i data-lucide="zap"></i></div>
-      <div><p class="g-name">Grupo Alavanca</p><p class="g-desc">Continua com o mesmo grupo · 30 min+/dia</p></div>
-    </div>
-    <button class="btn" style="width:100%;margin-bottom:10px" onclick="window.location.href='home.html'">Aceitar esta leitura</button>
-    <button class="btn-ghost" style="width:100%">Ver outras opções</button>
   </div>
 
   <!-- Tab bar — persistente -->
@@ -1002,9 +1033,64 @@ function go(id) {
   el.scrollTop=0;
 }
 function startTravezSuggestion() {
-  document.querySelector('#s-load .load-t').innerHTML='Buscando sua<br>próxima leitura…';
+  go('s-travez-pick');
+}
+
+function travezEndpoint() {
+  return window.location.protocol === 'file:'
+    ? 'http://localhost:3000/api/travez/recommendations'
+    : '/api/travez/recommendations';
+}
+
+function amazonUrl(item) {
+  const q = item.amazonQuery || `${item.title || ''} ${item.author || ''}`;
+  return `https://www.amazon.com.br/s?k=${encodeURIComponent(q).replace(/%20/g,'+')}`;
+}
+
+function renderRecs(items) {
+  const list = document.getElementById('rec-list');
+  list.innerHTML = '';
+  (items || []).forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'next-rec-card';
+    card.innerHTML = `
+      <p class="next-rec-title"></p>
+      <p class="next-rec-author"></p>
+      <p class="next-rec-label">Por que ler agora</p>
+      <p class="next-rec-text"></p>
+      <p class="next-rec-invite"></p>
+      <a class="btn" style="display:block;text-decoration:none;text-align:center" target="_blank" rel="noopener noreferrer">Quero ler este livro</a>
+    `;
+    card.querySelector('.next-rec-title').textContent = item.title;
+    card.querySelector('.next-rec-author').textContent = item.author;
+    card.querySelector('.next-rec-text').textContent = item.reason;
+    card.querySelector('.next-rec-invite').textContent = item.invitation;
+    card.querySelector('a').href = amazonUrl(item);
+    list.appendChild(card);
+  });
+}
+
+async function pickTravezOption(option) {
+  document.querySelector('#s-load .load-t').innerHTML = 'Buscando sua<br>próxima leitura…';
   go('s-load');
-  setTimeout(()=>go('s4'),2200);
+  try {
+    const r = await fetch(travezEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        completedBook: completedBook.title,
+        completedAuthor: completedBook.author,
+        option,
+        journeyContext: 'Leitor acabou de concluir a obra e busca uma nova experiência literária.'
+      })
+    });
+    const data = await r.json();
+    renderRecs(data.recommendations || []);
+  } catch (err) {
+    console.error(err);
+    renderRecs([]);
+  }
+  go('s4');
 }
 function startLoad() {
   const txt=document.getElementById('reflection').value;

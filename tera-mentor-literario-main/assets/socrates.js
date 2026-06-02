@@ -69,7 +69,7 @@
     if (!target) return;
 
     target.innerHTML = '';
-    (items || []).slice(0, 2).forEach(item => {
+    (items || []).slice(0, 3).forEach(item => {
       const card = document.createElement('div');
       card.className = 'travez-rec';
       card.innerHTML = `

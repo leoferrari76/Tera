@@ -21,7 +21,7 @@ O leitor concluiu o livro '[LIVRO_CONCLUIDO]', de [AUTOR_CONCLUIDO].
 
 A escolha do leitor para a próxima experiência foi: [OPCAO_ESCOLHIDA].
 
-Com base nisso, recomende exatamente 2 livros.
+Com base nisso, recomende exatamente 3 livros.
 
 Critérios:
 - Se o leitor escolheu mesmo autor, TODOS os livros sugeridos devem obrigatoriamente ser de [AUTOR_CONCLUIDO].
@@ -64,7 +64,8 @@ function sameAuthorRecommendations(author) {
   const byAuthor = {
     [normalizeAuthor('Franz Kafka')]: [
       ['O Processo', 'Franz Kafka', 'Para continuar no universo kafkiano da culpa sem forma, da lei opaca e da ansiedade social.', 'Uma travessia claustrofóbica por burocracia, acusação e impotência.', 'Entre em um labirinto onde a pergunta pesa mais que a resposta.'],
-      ['O Castelo', 'Franz Kafka', 'Para aprofundar a sensação de busca por reconhecimento diante de instituições inalcançáveis.', 'Uma experiência lenta, estranha e hipnótica sobre exclusão e autoridade.', 'Acompanhe alguém que tenta chegar ao centro, mas encontra apenas portas.']
+      ['O Castelo', 'Franz Kafka', 'Para aprofundar a sensação de busca por reconhecimento diante de instituições inalcançáveis.', 'Uma experiência lenta, estranha e hipnótica sobre exclusão e autoridade.', 'Acompanhe alguém que tenta chegar ao centro, mas encontra apenas portas.'],
+      ['Na Colônia Penal', 'Franz Kafka', 'Para mergulhar no absurdo do poder e da punição, temas centrais no universo kafkiano.', 'Uma leitura perturbadora, densa e inesquecível sobre obediência e violência institucional.', 'Descubra uma máquina que não precisa de culpa para condenar.']
     ],
     [normalizeAuthor('Socorro Acioli')]: [
       ['Oração para Desaparecer', 'Socorro Acioli', 'Para continuar na voz de uma autora que trabalha memória, pertencimento e mistério com delicadeza.', 'Uma experiência sensível, simbólica e atravessada por busca interior.', 'Entre em uma história onde desaparecer também pode ser uma forma de se encontrar.'],
@@ -73,13 +74,15 @@ function sameAuthorRecommendations(author) {
     ],
     [normalizeAuthor('Nir Eyal')]: [
       ['Indistraível', 'Nir Eyal', 'Para aprofundar a relação entre atenção, comportamento e escolhas depois de uma leitura sobre formação de hábitos.', 'Uma experiência prática, direta e voltada à autonomia.', 'Leia para recuperar o controle do que captura sua atenção.'],
-      ['Hooked', 'Nir Eyal', 'Para revisitar os mecanismos de produto e comportamento a partir de uma nova camada de aplicação.', 'Uma leitura objetiva, analítica e acionável.', 'Volte ao ciclo do hábito com olhos mais críticos.']
+      ['Hooked', 'Nir Eyal', 'Para revisitar os mecanismos de produto e comportamento a partir de uma nova camada de aplicação.', 'Uma leitura objetiva, analítica e acionável.', 'Volte ao ciclo do hábito com olhos mais críticos.'],
+      ['Produto Viciante', 'Nir Eyal', 'Para explorar o lado ético e estratégico de criar produtos que engajam, com a perspectiva original do autor.', 'Uma leitura reflexiva sobre intenção e responsabilidade no design de comportamento.', 'Leia para decidir conscientemente que tipo de produto você quer construir.']
     ]
   };
 
   return byAuthor[normalizeAuthor(author)] || [
     [`Obra de ${author}`, author, `Para permanecer na voz literária de ${author}, sem deslocar a experiência para outro autor.`, 'Uma continuação focada em reconhecer recorrências, temas e estilo do mesmo percurso autoral.', `Siga com ${author} e observe o que se repete, muda ou aprofunda.`],
-    [`Outra obra de ${author}`, author, `Para ampliar a leitura dentro da mesma autoria e manter coerência com a escolha do leitor.`, 'Uma experiência de continuidade autoral, feita para comparar atmosfera, linguagem e inquietações.', `Permaneça no mesmo universo autoral por mais algumas páginas.`]
+    [`Outra obra de ${author}`, author, `Para ampliar a leitura dentro da mesma autoria e manter coerência com a escolha do leitor.`, 'Uma experiência de continuidade autoral, feita para comparar atmosfera, linguagem e inquietações.', `Permaneça no mesmo universo autoral por mais algumas páginas.`],
+    [`Mais uma obra de ${author}`, author, `Para completar uma leitura mais ampla da obra de ${author} e perceber o que atravessa diferentes trabalhos do autor.`, 'Uma experiência de imersão autoral que revela constâncias e transformações ao longo da obra.', `Conclua o retrato de ${author} com uma nova entrada no mesmo universo.`]
   ];
 }
 
@@ -88,16 +91,18 @@ function fallbackRecommendations(option, completedAuthor = 'Franz Kafka') {
     same_author: sameAuthorRecommendations(completedAuthor),
     similar_style_or_theme: [
       ['O Estrangeiro', 'Albert Camus', 'Para seguir investigando deslocamento, absurdo e a frieza do mundo diante de uma consciência isolada.', 'Uma leitura seca, luminosa e inquietante.', 'Entre em uma narrativa onde sentir pouco também vira condenação.'],
-      ['Memórias do Subsolo', 'Fiódor Dostoiévski', 'Para aprofundar a voz de alguém dividido entre lucidez, ressentimento e autossabotagem.', 'Uma experiência intensa, psicológica e desconfortavelmente íntima.', 'Desça alguns degraus na mente de quem não consegue fazer paz consigo.']
+      ['Memórias do Subsolo', 'Fiódor Dostoiévski', 'Para aprofundar a voz de alguém dividido entre lucidez, ressentimento e autossabotagem.', 'Uma experiência intensa, psicológica e desconfortavelmente íntima.', 'Desça alguns degraus na mente de quem não consegue fazer paz consigo.'],
+      ['A Náusea', 'Jean-Paul Sartre', 'Para explorar a experiência de um personagem que estranha a própria existência e o mundo ao redor.', 'Uma leitura filosófica e visceral sobre consciência, liberdade e absurdo.', 'Leia quando quiser sentir o peso e a estranheza de simplesmente existir.']
     ],
     completely_new: [
       ['A Hora da Estrela', 'Clarice Lispector', 'Para mudar de atmosfera sem abandonar a pergunta sobre invisibilidade e existência.', 'Uma experiência lírica, cortante e profundamente humana.', 'Conheça uma vida pequena apenas para descobrir que nada nela é pequeno.'],
-      ['O Velho e o Mar', 'Ernest Hemingway', 'Para sair do confinamento kafkiano e entrar em uma solidão mais aberta, física e simbólica.', 'Uma leitura limpa, marítima e meditativa.', 'Acompanhe uma luta simples que carrega uma dignidade imensa.']
+      ['O Velho e o Mar', 'Ernest Hemingway', 'Para sair do confinamento kafkiano e entrar em uma solidão mais aberta, física e simbólica.', 'Uma leitura limpa, marítima e meditativa.', 'Acompanhe uma luta simples que carrega uma dignidade imensa.'],
+      ['Cem Anos de Solidão', 'Gabriel García Márquez', 'Para mergulhar em um universo completamente distinto — épico, mágico e cheio de vida.', 'Uma experiência imersiva, sensorial e radicalmente diferente.', 'Entre em Macondo e deixe que o tempo perca o sentido que você conhece.']
     ]
   };
 
   return {
-    recommendations: (common[option] || common.similar_style_or_theme).slice(0, 2).map(([title, author, reason, experience, invitation]) => ({
+    recommendations: (common[option] || common.similar_style_or_theme).slice(0, 3).map(([title, author, reason, experience, invitation]) => ({
       title,
       author,
       reason,
@@ -110,7 +115,7 @@ function fallbackRecommendations(option, completedAuthor = 'Franz Kafka') {
 
 function isValidForOption(payload, option, expectedAuthor) {
   const recommendations = payload?.recommendations || [];
-  if (recommendations.length !== 2) return false;
+  if (recommendations.length !== 3) return false;
   if (option !== 'same_author') return true;
   const expected = normalizeAuthor(expectedAuthor);
   return recommendations.every(item => normalizeAuthor(item.author) === expected);
@@ -121,7 +126,7 @@ function parseRecommendations(text) {
   const parsed = JSON.parse(cleaned);
   if (!Array.isArray(parsed.recommendations)) throw new Error('Invalid recommendation shape');
   return {
-    recommendations: parsed.recommendations.slice(0, 2).map(item => ({
+    recommendations: parsed.recommendations.slice(0, 3).map(item => ({
       title: String(item.title || '').trim(),
       author: String(item.author || '').trim(),
       reason: String(item.reason || '').trim(),
