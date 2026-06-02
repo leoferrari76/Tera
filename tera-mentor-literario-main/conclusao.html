@@ -651,35 +651,9 @@ body {
     <div class="chat-replies" id="chat-replies"></div>
   </div>
 
-  <!-- ══ S2: APROFUNDAMENTO GUIADO ══════════════ -->
-  <div class="screen" id="s-deep">
-    <button class="back" onclick="go('s1')">← Voltar</button>
-    <p class="ai-lbl">IA Travez</p>
-    <p class="ai-msg">Antes da sua reflexão, vamos abrir camadas da obra.</p>
-    <p class="deep-intro">Use este mapa como apoio. Ele não substitui sua leitura: apenas ilumina caminhos para você perceber o que ficou vivo.</p>
-
-    <div class="deep-list" id="deep-list"></div>
-
-    <div class="next-step">
-      <p class="next-step-title">Escolha sua próxima etapa</p>
-      <div class="path-list">
-        <div class="path-card">
-          <p class="path-kicker">Opção 1 — Reflexão</p>
-          <p class="path-desc">Compartilhe com outros leitores o que essa leitura provocou em você.</p>
-          <button class="path-btn" type="button" onclick="go('s2')">Escrever minha reflexão</button>
-        </div>
-        <div class="path-card">
-          <p class="path-kicker">Opção 2 — IA Travez</p>
-          <p class="path-desc">Receba uma sugestão de nova experiência literária inspirada no que você acabou de viver nesta obra.</p>
-          <button class="path-btn" type="button" onclick="startTravezSuggestion()">Quero dicas de leitura da IA Travez</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ══ S3: REFLEXÃO ═══════════════════════════ -->
   <div class="screen" id="s2">
-    <button class="back" onclick="go('s-deep')">← Voltar</button>
+    <button class="back" onclick="go('s-chat')">← Voltar</button>
     <div style="padding:72px 32px 96px; display:flex; flex-direction:column; height:100%;">
       <p class="ai-lbl">IA Travez</p>
       <p class="ai-msg">O que ficou desta leitura para você?</p>
@@ -711,7 +685,7 @@ body {
         <div><p class="resp-nm">IA Travez</p><p class="resp-sub">Leu sua reflexão</p></div>
       </div>
       <div class="echo" id="echo">"Sempre joguei para ganhar quando devia estar jogando para continuar…"</div>
-      <p class="resp-body">Você não só leu — você jogou de volta. Conectar o livro com suas negociações exige uma leitura ativa que poucos fazem.</p>
+      <p class="resp-body">Você não só leu — você se deixou atravessar. Conectar a obra com a própria vida exige uma leitura ativa que poucos fazem.</p>
       <div class="insight">
         <p class="ins-lbl">O que isso diz sobre você</p>
         <p class="ins-txt">Você chegou aqui em Modo Expansão. Saiu com uma nova lente. A próxima intervenção começa de um lugar diferente — mais alto.</p>
@@ -749,7 +723,7 @@ body {
   <div class="tab-bar">
     <div class="tab on" onclick="window.location.href='home.html'"><span class="tab-ico"><i data-lucide="house"></i></span><span class="tab-lbl">Início</span></div>
     <div class="tab" onclick="window.location.href='home.html'"><span class="tab-ico"><i data-lucide="message-circle"></i></span><span class="tab-lbl">Sala</span></div>
-    <div class="tab"><span class="tab-ico"><i data-lucide="user"></i></span><span class="tab-lbl">Perfil</span></div>
+    <div class="tab" style="display:none"><span class="tab-ico"><i data-lucide="user"></i></span><span class="tab-lbl">Perfil</span></div>
   </div>
 
 </div>
@@ -782,85 +756,6 @@ function applyCompletedBook() {
     reflection.value=`Esse livro, ${completedBook.title}, mudou como vejo as camadas entre história e vida. Quero registrar o que essa leitura provocou em mim antes de seguir para a próxima experiência literária.`;
     onType();
   }
-}
-
-function deepeningMock() {
-  return [
-    {
-      title:'Ideias centrais da obra',
-      items:[
-        `${completedBook.title} organiza uma experiência de leitura em torno das tensões que atravessam a trajetória proposta por ${completedBook.author}.`,
-        'A obra funciona como uma lente para observar escolhas, deslocamentos internos e aquilo que permanece depois da última página.'
-      ]
-    },
-    {
-      title:'O que está nas entrelinhas',
-      items:[
-        'O que mais importa talvez não esteja apenas no enredo, mas na forma como a leitura reposiciona o olhar do leitor.',
-        'As entrelinhas convidam a perceber que toda obra também revela algo sobre o momento de vida de quem a encontra.'
-      ]
-    },
-    {
-      title:'Contexto de fundo da obra',
-      items:[
-        `${completedBook.author} conduz uma experiência literária que pode ser lida a partir de seu tempo, de suas inquietações e da forma como escolhe dar corpo ao conflito humano.`,
-        'A leitura ganha profundidade quando o livro deixa de ser apenas história e passa a conversar com repertório, memória e circunstância.'
-      ]
-    },
-    {
-      title:'Perguntas para reflexão',
-      items:[
-        `O que ${completedBook.title} fez você perceber que talvez já estivesse em movimento dentro de você?`,
-        'Que imagem, cena ou ideia continuou ecoando depois da leitura?'
-      ]
-    },
-    {
-      title:'Conexões com a vida prática',
-      items:[
-        'A obra pode ser levada para a vida como uma pergunta sobre atenção: o que você passa a notar depois dela?',
-        'A próxima escolha literária pode partir justamente do incômodo, da beleza ou da dúvida que esta leitura deixou.'
-      ]
-    }
-  ];
-}
-
-async function getDeepening() {
-  // Futuro ponto de integração: trocar este mock por uma chamada real ao backend.
-  // Exemplo: const r = await fetch('/api/deepening', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ book:'A Metamorfose', author:'Franz Kafka' }) });
-  // return await r.json();
-  return new Promise(resolve => setTimeout(() => resolve(deepeningMock()), 450));
-}
-
-function renderDeepening(sections) {
-  const list=document.getElementById('deep-list');
-  list.innerHTML='';
-  sections.forEach(section=>{
-    const card=document.createElement('div');
-    card.className='deep-card';
-
-    const title=document.createElement('p');
-    title.className='deep-title';
-    title.textContent=section.title;
-
-    const body=document.createElement('div');
-    body.className='deep-text';
-    const ul=document.createElement('ul');
-    section.items.forEach(item=>{
-      const li=document.createElement('li');
-      li.textContent=item;
-      ul.appendChild(li);
-    });
-    body.appendChild(ul);
-
-    card.appendChild(title);
-    card.appendChild(body);
-    list.appendChild(card);
-  });
-}
-
-async function startDeepening() {
-  go('s-deep');
-  renderDeepening(await getDeepening());
 }
 
 /* ── CHAT COM O AUTOR ─────────────────────── */
